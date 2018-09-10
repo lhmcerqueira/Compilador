@@ -4,29 +4,22 @@ import entidades.Arquivo;
 import entidades.Token;
 
 public class AnalisadorLexico {
-	private Arquivo arquivo;
-	private char caractereCorrente;
-	public Arquivo getArquivo() {
-		return arquivo;
-	}
-
-	public void setArquivo(Arquivo arquivo) {
-		this.arquivo = arquivo;
-	}
 	
-	public Token analiseLexical() {
+	private char caractereCorrente;
+			
+	public Token analiseLexical(Arquivo arquivo) {
 		Token token = new Token();
-		lerCaractere();
+		lerCaractere(arquivo);
 		while(!arquivo.fimDoArquivo()) {
 			while((caractereCorrente=='{'||caractereCorrente==' ')&& !arquivo.fimDoArquivo()) {
 				if(caractereCorrente=='{') {
 					while(caractereCorrente!='}' && !arquivo.fimDoArquivo()) {
-						lerCaractere();
+						lerCaractere(arquivo);
 					}
-					lerCaractere();
+					lerCaractere(arquivo);
 				}
 				while(caractereCorrente==' ') {
-					lerCaractere();
+					lerCaractere(arquivo);
 				}
 			}
 			if(!arquivo.fimDoArquivo()) {
@@ -41,7 +34,7 @@ public class AnalisadorLexico {
 		return null;
 	}
 	
-	private void lerCaractere() {
+	private void lerCaractere(Arquivo arquivo) {
 		caractereCorrente = arquivo.lerCaractere();
 	}
 }
