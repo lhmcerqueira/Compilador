@@ -6,6 +6,13 @@ public class Arquivo {
 	private int linhaCorrente;
 	private String arquivo;
 	
+	public Arquivo(int indiceCorrente, int tamanho, int linhaCorrente, String arquivo) {
+		super();
+		this.indiceCorrente = indiceCorrente;
+		this.tamanho = tamanho;
+		this.linhaCorrente = linhaCorrente;
+		this.arquivo = arquivo;
+	}
 	public int getIndiceCorrente() {
 		return indiceCorrente;
 	}

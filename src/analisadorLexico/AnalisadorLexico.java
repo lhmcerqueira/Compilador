@@ -24,6 +24,7 @@ public class AnalisadorLexico {
 			}
 			if(!arquivo.fimDoArquivo()) {
 				token = pegaToken();
+				//TODO implementar o pegaToken
 			}
 		}
 		

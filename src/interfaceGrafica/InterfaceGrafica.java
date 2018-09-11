@@ -10,6 +10,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import compilador.Compilador;
+import entidades.Arquivo;
 import utils.AbridorDeArquivos;
 
 public class InterfaceGrafica {
@@ -17,7 +19,7 @@ public class InterfaceGrafica {
 	protected Shell shell;
 	private Text text;
 	private Button btnAbrirCdigoFnte;
-	
+	Arquivo arquivo;
 
 	/**
 	 * Launch the application.
@@ -62,6 +64,10 @@ public class InterfaceGrafica {
 		btnCompilar.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				arquivo = new Arquivo(0,text.getText().length(),0,text.getText());
+				Compilador compilador = new Compilador();
+				compilador.compila(arquivo);
+				//TODO escrever a lista de tokens na list area que será implementado
 			}
 		});
 		btnCompilar.setBounds(10, 202, 75, 25);
@@ -73,7 +79,7 @@ public class InterfaceGrafica {
 			public void widgetSelected(SelectionEvent e) {
 				AbridorDeArquivos abridorDeArquivos = new AbridorDeArquivos();
 				 try {
-					abridorDeArquivos.abrirArquivo();
+					text.setText(abridorDeArquivos.abrirArquivo());
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
