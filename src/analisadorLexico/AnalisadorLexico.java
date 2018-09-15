@@ -2,12 +2,17 @@ package analisadorLexico;
 
 import entidades.Arquivo;
 import entidades.Token;
+import enums.SimboloEnum;
+import exceptions.FimInesperadoDoArquivoException;
 
 public class AnalisadorLexico {
 	
+	private static final String LETRA_DIGITO_SUBLINHADO = "[a-zA-Z0-9_]";
+	private static final String LETRA = "[a-zA-Z]";
+	private static final String DIGITO = "\\d";
 	private char caractereCorrente;
 			
-	public Token analiseLexical(Arquivo arquivo) {
+	public Token analiseLexical(Arquivo arquivo) throws FimInesperadoDoArquivoException {
 		Token token = new Token();
 		lerCaractere(arquivo);
 		while(!arquivo.fimDoArquivo()) {
@@ -23,19 +28,114 @@ public class AnalisadorLexico {
 				}
 			}
 			if(!arquivo.fimDoArquivo()) {
-				token = pegaToken();
-				//TODO implementar o pegaToken
+				return pegaToken(arquivo);
 			}
+		}
+		
+		return null;
+	}
+
+	private Token pegaToken(Arquivo arquivo) throws FimInesperadoDoArquivoException {
+		
+		String valorStringDoCaractere = String.valueOf(caractereCorrente);
+		if(valorStringDoCaractere.matches(DIGITO)) {
+			return trataDigito(arquivo);
+		} else if(valorStringDoCaractere.matches(LETRA)) {
+			return trataIdentificadorEPalavraReservada(arquivo);
+		}
+		return null;
+	}
+	
+	private Token trataDigito(Arquivo arquivo) throws FimInesperadoDoArquivoException {
+		StringBuilder num = new StringBuilder();
+		num = num.append(String.valueOf(caractereCorrente));
+		lerCaractere(arquivo);
+		while(String.valueOf(caractereCorrente).matches(DIGITO)) {
+			num = num.append(String.valueOf(caractereCorrente));
+			lerCaractere(arquivo);
+		}
+		return new Token(SimboloEnum.Snumero, num.toString());
+	}
+	
+	private Token trataIdentificadorEPalavraReservada(Arquivo arquivo) throws FimInesperadoDoArquivoException {
+		StringBuilder id = new StringBuilder();
+		id = id.append(caractereCorrente);
+		lerCaractere(arquivo);
+		while(String.valueOf(caractereCorrente).matches(LETRA_DIGITO_SUBLINHADO)) {
+			id.append(caractereCorrente);
+			lerCaractere(arquivo);
+		}
+		Token token = new Token();
+		token.setLexema(id.toString());
+		switch (id.toString()) {
+			case "programa":
+				token.setSimbolo(SimboloEnum.Sprograma);
+				break;
+			case "se":
+				token.setSimbolo(SimboloEnum.Se);
+				break;
+			case "entao":
+				token.setSimbolo(SimboloEnum.Sentao);
+				break;
+			case "senao":
+				token.setSimbolo(SimboloEnum.Ssenao);
+				break;
+			case "enquanto":
+				token.setSimbolo(SimboloEnum.Senquanto);
+				break;
+			case "faca":
+				token.setSimbolo(SimboloEnum.Sfaca);
+				break;
+			case "início":
+				token.setSimbolo(SimboloEnum.Sinicio);
+				break;
+			case "fim":
+				token.setSimbolo(SimboloEnum.Sfim);
+				break;
+			case "escreva":
+				token.setSimbolo(SimboloEnum.Sescreva);
+				break;
+			case "var":
+				token.setSimbolo(SimboloEnum.Svar);
+				break;
+			case "inteiro":
+				token.setSimbolo(SimboloEnum.Sinteiro);
+				break;
+			case "booleano":
+				token.setSimbolo(SimboloEnum.Sbooleano);
+				break;
+			case "verdadeiro":
+				token.setSimbolo(SimboloEnum.Sverdadeiro);
+				break;
+			case "falso":
+				token.setSimbolo(SimboloEnum.Sfalso);
+				break;
+			case "procedimento":
+				token.setSimbolo(SimboloEnum.Sprocedimento);
+				break;
+			case "funcao":
+				token.setSimbolo(SimboloEnum.Sfuncao);
+				break;
+			case "div":
+				token.setSimbolo(SimboloEnum.Sdiv);
+				break;
+			case "e":
+				token.setSimbolo(SimboloEnum.Se);
+				break;
+			case "ou":
+				token.setSimbolo(SimboloEnum.Sou);
+				break;
+			case "nao":
+				token.setSimbolo(SimboloEnum.Snao);
+				break;
+			default:
+				token.setSimbolo(SimboloEnum.Sidentificador);
+				break;
 		}
 		
 		return token;
 	}
-
-	private Token pegaToken() {
-		return null;
-	}
-	
-	private void lerCaractere(Arquivo arquivo) {
+	private void lerCaractere(Arquivo arquivo) throws FimInesperadoDoArquivoException {
 		caractereCorrente = arquivo.lerCaractere();
 	}
 }

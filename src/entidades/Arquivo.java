@@ -1,5 +1,7 @@
 package entidades;
 
+import exceptions.FimInesperadoDoArquivoException;
+
 public class Arquivo {
 	private int indiceCorrente;
 	private int tamanho;
@@ -46,10 +48,16 @@ public class Arquivo {
 		this.linhaCorrente++;
 	}
 	
-	public char lerCaractere() {
+	public char lerCaractere() throws FimInesperadoDoArquivoException {
 		int indiceRequisitado = getIndiceCorrente();
 		incrementaIndice();
-		return this.arquivo.charAt(indiceRequisitado);
+		char caractere = 0;
+		try {
+			caractere = this.arquivo.charAt(indiceRequisitado);
+		}catch (StringIndexOutOfBoundsException e) {
+			throw new FimInesperadoDoArquivoException(e);
+		}
+		return caractere;
 	}
 	
 	public boolean fimDoArquivo() {
