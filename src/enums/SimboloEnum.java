@@ -25,6 +25,8 @@ public enum SimboloEnum {
 	Sou("Sou"),
 	Snao("Snao"),
 	Sidentificador("Sidentificador"),
+	Satribuicao("Satribuicao"),
+	Sdoispontos("Sdoispontos"),
 	Serro("Serro");
 	private String simbolo;
 	

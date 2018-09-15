@@ -13,7 +13,7 @@ public class AnalisadorLexico {
 	private char caractereCorrente;
 			
 	public Token analiseLexical(Arquivo arquivo) throws FimInesperadoDoArquivoException {
-		Token token = new Token();
+		
 		lerCaractere(arquivo);
 		while(!arquivo.fimDoArquivo()) {
 			while((caractereCorrente=='{'||caractereCorrente==' ')&& !arquivo.fimDoArquivo()) {
@@ -42,6 +42,8 @@ public class AnalisadorLexico {
 			return trataDigito(arquivo);
 		} else if(valorStringDoCaractere.matches(LETRA)) {
 			return trataIdentificadorEPalavraReservada(arquivo);
+		} else if(valorStringDoCaractere.matches(":")) {
+			return trataAtribuicao(arquivo);
 		}
 		return null;
 	}
@@ -86,7 +88,7 @@ public class AnalisadorLexico {
 			case "faca":
 				token.setSimbolo(SimboloEnum.Sfaca);
 				break;
-			case "início":
+			case "inicio":
 				token.setSimbolo(SimboloEnum.Sinicio);
 				break;
 			case "fim":
@@ -135,6 +137,18 @@ public class AnalisadorLexico {
 		
 		return token;
 	}
+	
+	private Token trataAtribuicao(Arquivo arquivo) throws FimInesperadoDoArquivoException {
+		StringBuilder atrib = new StringBuilder();
+		atrib = atrib.append(caractereCorrente);
+		lerCaractere(arquivo);
+		if(String.valueOf(caractereCorrente).equals("=")) {
+			atrib = atrib.append(caractereCorrente);
+			return new Token(SimboloEnum.Satribuicao, atrib.toString());
+		} 
+		return new Token(SimboloEnum.Sdoispontos, atrib.toString());
+	}
+	
 	private void lerCaractere(Arquivo arquivo) throws FimInesperadoDoArquivoException {
 		caractereCorrente = arquivo.lerCaractere();
 	}

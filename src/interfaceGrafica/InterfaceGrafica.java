@@ -68,7 +68,7 @@ public class InterfaceGrafica {
 		text.setBounds(10, 10, 535, 346);
 		
 		tabelaToken = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
-		tabelaToken.setBounds(10, 411, 146, 113);
+		tabelaToken.setBounds(10, 411, 535, 113);
 		tabelaToken.setHeaderVisible(true);
 		tabelaToken.setLinesVisible(true);
 		

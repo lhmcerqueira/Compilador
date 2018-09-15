@@ -26,7 +26,7 @@ public class Compilador {
 	//TODO mudar o retorno do método conforme a necessidade
 	public void compila(Arquivo arquivo) {
 		
-		while(!arquivo.fimDoArquivo()&&listaToken.size()<2) {
+		while(!arquivo.fimDoArquivo()&&listaToken.size()<6) {
 			try {
 				listaToken.add(analisadorLexico.analiseLexical(arquivo));
 			} catch (FimInesperadoDoArquivoException e) {

@@ -3,6 +3,7 @@ package entidades;
 import exceptions.FimInesperadoDoArquivoException;
 
 public class Arquivo {
+	private char caractereCorrente;
 	private int indiceCorrente;
 	private int tamanho;
 	private int linhaCorrente;
