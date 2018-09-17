@@ -9,13 +9,19 @@ public class Arquivo {
 	private int linhaCorrente;
 	private String arquivo;
 	
-	public Arquivo(int indiceCorrente, int tamanho, int linhaCorrente, String arquivo) {
+	public Arquivo(char caractereCorrente, int indiceCorrente, int tamanho, int linhaCorrente, String arquivo) {
 		super();
+		this.caractereCorrente = caractereCorrente;
 		this.indiceCorrente = indiceCorrente;
 		this.tamanho = tamanho;
 		this.linhaCorrente = linhaCorrente;
 		this.arquivo = arquivo;
 	}
+
+	public char getCaractereCorrente() {
+		return this.caractereCorrente;
+	}
+	
 	public int getIndiceCorrente() {
 		return indiceCorrente;
 	}
@@ -49,16 +55,14 @@ public class Arquivo {
 		this.linhaCorrente++;
 	}
 	
-	public char lerCaractere() throws FimInesperadoDoArquivoException {
+	public void lerCaractere() throws FimInesperadoDoArquivoException {
 		int indiceRequisitado = getIndiceCorrente();
 		incrementaIndice();
-		char caractere = 0;
 		try {
-			caractere = this.arquivo.charAt(indiceRequisitado);
+			this.caractereCorrente = this.arquivo.charAt(indiceRequisitado);
 		}catch (StringIndexOutOfBoundsException e) {
 			throw new FimInesperadoDoArquivoException(e);
 		}
-		return caractere;
 	}
 	
 	public boolean fimDoArquivo() {

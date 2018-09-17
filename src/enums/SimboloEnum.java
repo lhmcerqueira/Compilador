@@ -1,7 +1,6 @@
 package enums;
 
 public enum SimboloEnum {
-	//TODO criar os Ssimbolos
 	Snumero("Snumero"),
 	Sprograma("Sprograma"),
 	Sse("Sse"),
@@ -27,6 +26,9 @@ public enum SimboloEnum {
 	Sidentificador("Sidentificador"),
 	Satribuicao("Satribuicao"),
 	Sdoispontos("Sdoispontos"),
+	Smais("Smais"),
+	Smenos("Smenos"),
+	Smult("Smult"),
 	Serro("Serro");
 	private String simbolo;
 	

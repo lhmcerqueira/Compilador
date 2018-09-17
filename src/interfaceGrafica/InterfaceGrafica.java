@@ -85,7 +85,7 @@ public class InterfaceGrafica {
 		btnCompilar.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				arquivo = new Arquivo(0,text.getText().length(),0,text.getText());
+				arquivo = new Arquivo(' ',0,text.getText().length(),0,text.getText());
 				Compilador compilador = new Compilador();
 				compilador.compila(arquivo);
 				for(Token token : compilador.getListaToken()) {

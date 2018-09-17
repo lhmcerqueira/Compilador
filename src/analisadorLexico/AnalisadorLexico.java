@@ -7,23 +7,23 @@ import exceptions.FimInesperadoDoArquivoException;
 
 public class AnalisadorLexico {
 	
+	private static final String OPERADOR_ARITIMETICO = "[\\+\\-\\*]";
+	private static final String DOIS_PONTOS = ":";
 	private static final String LETRA_DIGITO_SUBLINHADO = "[a-zA-Z0-9_]";
 	private static final String LETRA = "[a-zA-Z]";
 	private static final String DIGITO = "\\d";
-	private char caractereCorrente;
 			
 	public Token analiseLexical(Arquivo arquivo) throws FimInesperadoDoArquivoException {
 		
-		lerCaractere(arquivo);
 		while(!arquivo.fimDoArquivo()) {
-			while((caractereCorrente=='{'||caractereCorrente==' ')&& !arquivo.fimDoArquivo()) {
-				if(caractereCorrente=='{') {
-					while(caractereCorrente!='}' && !arquivo.fimDoArquivo()) {
+			while((arquivo.getCaractereCorrente()=='{'||arquivo.getCaractereCorrente()==' ')&& !arquivo.fimDoArquivo()) {
+				if(arquivo.getCaractereCorrente()=='{') {
+					while(arquivo.getCaractereCorrente()!='}' && !arquivo.fimDoArquivo()) {
 						lerCaractere(arquivo);
 					}
 					lerCaractere(arquivo);
 				}
-				while(caractereCorrente==' ') {
+				while(arquivo.getCaractereCorrente()==' ') {
 					lerCaractere(arquivo);
 				}
 			}
@@ -37,23 +37,25 @@ public class AnalisadorLexico {
 
 	private Token pegaToken(Arquivo arquivo) throws FimInesperadoDoArquivoException {
 		
-		String valorStringDoCaractere = String.valueOf(caractereCorrente);
+		String valorStringDoCaractere = String.valueOf(arquivo.getCaractereCorrente());
 		if(valorStringDoCaractere.matches(DIGITO)) {
 			return trataDigito(arquivo);
 		} else if(valorStringDoCaractere.matches(LETRA)) {
 			return trataIdentificadorEPalavraReservada(arquivo);
-		} else if(valorStringDoCaractere.matches(":")) {
+		} else if(valorStringDoCaractere.matches(DOIS_PONTOS)) {
 			return trataAtribuicao(arquivo);
+		} else if(valorStringDoCaractere.matches(OPERADOR_ARITIMETICO)) {
+			return trataOperadorAritimetico(arquivo);
 		}
 		return null;
 	}
 	
 	private Token trataDigito(Arquivo arquivo) throws FimInesperadoDoArquivoException {
 		StringBuilder num = new StringBuilder();
-		num = num.append(String.valueOf(caractereCorrente));
+		num = num.append(String.valueOf(arquivo.getCaractereCorrente()));
 		lerCaractere(arquivo);
-		while(String.valueOf(caractereCorrente).matches(DIGITO)) {
-			num = num.append(String.valueOf(caractereCorrente));
+		while(String.valueOf(arquivo.getCaractereCorrente()).matches(DIGITO)) {
+			num = num.append(String.valueOf(arquivo.getCaractereCorrente()));
 			lerCaractere(arquivo);
 		}
 		return new Token(SimboloEnum.Snumero, num.toString());
@@ -61,10 +63,10 @@ public class AnalisadorLexico {
 	
 	private Token trataIdentificadorEPalavraReservada(Arquivo arquivo) throws FimInesperadoDoArquivoException {
 		StringBuilder id = new StringBuilder();
-		id = id.append(caractereCorrente);
+		id = id.append(arquivo.getCaractereCorrente());
 		lerCaractere(arquivo);
-		while(String.valueOf(caractereCorrente).matches(LETRA_DIGITO_SUBLINHADO)) {
-			id.append(caractereCorrente);
+		while(String.valueOf(arquivo.getCaractereCorrente()).matches(LETRA_DIGITO_SUBLINHADO)) {
+			id.append(arquivo.getCaractereCorrente());
 			lerCaractere(arquivo);
 		}
 		Token token = new Token();
@@ -140,16 +142,33 @@ public class AnalisadorLexico {
 	
 	private Token trataAtribuicao(Arquivo arquivo) throws FimInesperadoDoArquivoException {
 		StringBuilder atrib = new StringBuilder();
-		atrib = atrib.append(caractereCorrente);
+		atrib = atrib.append(arquivo.getCaractereCorrente());
 		lerCaractere(arquivo);
-		if(String.valueOf(caractereCorrente).equals("=")) {
-			atrib = atrib.append(caractereCorrente);
+		if(String.valueOf(arquivo.getCaractereCorrente()).equals("=")) {
+			atrib = atrib.append(arquivo.getCaractereCorrente());
+			lerCaractere(arquivo);
 			return new Token(SimboloEnum.Satribuicao, atrib.toString());
 		} 
 		return new Token(SimboloEnum.Sdoispontos, atrib.toString());
 	}
 	
+	private Token trataOperadorAritimetico(Arquivo arquivo) throws FimInesperadoDoArquivoException {
+		String arit = new String();
+		arit = String.valueOf(arquivo.getCaractereCorrente());
+		Token token = new Token();
+		token.setLexema(arit);
+		if(arit.matches("[\\+]")) {
+			token.setSimbolo(SimboloEnum.Smais);
+		} else if(arit.matches("[\\-]")) {
+			token.setSimbolo(SimboloEnum.Smenos);
+		} else if(arit.matches("[\\*]")) {
+			token.setSimbolo(SimboloEnum.Smult);
+		}
+		lerCaractere(arquivo);
+		return token;
+	}
+	
 	private void lerCaractere(Arquivo arquivo) throws FimInesperadoDoArquivoException {
-		caractereCorrente = arquivo.lerCaractere();
+		arquivo.lerCaractere();
 	}
 }
