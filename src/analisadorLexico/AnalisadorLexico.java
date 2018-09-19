@@ -3,7 +3,6 @@ package analisadorLexico;
 import entidades.Arquivo;
 import entidades.Token;
 import enums.SimboloEnum;
-import exceptions.FimInesperadoDoArquivoException;
 
 public class AnalisadorLexico {
 	
@@ -46,6 +45,10 @@ public class AnalisadorLexico {
 			return trataAtribuicao(arquivo);
 		} else if(valorStringDoCaractere.matches(OPERADOR_ARITIMETICO)) {
 			return trataOperadorAritimetico(arquivo);
+		} else if(valorStringDoCaractere.matches("[\\<\\>\\!\\=]")) {
+			return trataOperadorRelacional(arquivo);
+		} else if(valorStringDoCaractere.matches("[\\.\\;\\,]")) {
+			return trataPontuacao(arquivo);
 		}
 		return null;
 	}
@@ -163,6 +166,66 @@ public class AnalisadorLexico {
 			token.setSimbolo(SimboloEnum.Smenos);
 		} else if(arit.matches("[\\*]")) {
 			token.setSimbolo(SimboloEnum.Smult);
+		}
+		lerCaractere(arquivo);
+		return token;
+	}
+	
+	private Token trataOperadorRelacional(Arquivo arquivo) {
+		StringBuilder relat = new StringBuilder();
+
+		if(String.valueOf(arquivo.getCaractereCorrente()).matches("[\\<]")) {
+			relat = relat.append(arquivo.getCaractereCorrente());
+			lerCaractere(arquivo);
+			if(String.valueOf(arquivo.getCaractereCorrente()).equals("=")) {
+				relat = relat.append(arquivo.getCaractereCorrente());
+				lerCaractere(arquivo);
+				return new Token(SimboloEnum.Smenorig, relat.toString());
+			}
+			return new Token(SimboloEnum.Smenor, relat.toString());
+		}
+
+		if(String.valueOf(arquivo.getCaractereCorrente()).matches("[\\>]")) {
+			relat = relat.append(arquivo.getCaractereCorrente());
+			lerCaractere(arquivo);
+			if(String.valueOf(arquivo.getCaractereCorrente()).equals("=")) {
+				relat = relat.append(arquivo.getCaractereCorrente());
+				lerCaractere(arquivo);
+				return new Token(SimboloEnum.Smaiorig, relat.toString());
+			}
+			return new Token(SimboloEnum.Smaior, relat.toString());
+		}
+		
+
+		if(String.valueOf(arquivo.getCaractereCorrente()).matches("[\\!]")) {
+			relat = relat.append(arquivo.getCaractereCorrente());
+			lerCaractere(arquivo);
+			if(String.valueOf(arquivo.getCaractereCorrente()).equals("=")) {
+				relat = relat.append(arquivo.getCaractereCorrente());
+				lerCaractere(arquivo);
+				return new Token(SimboloEnum.Sdif, relat.toString());
+			}
+			return null;
+		} 
+		if(String.valueOf(arquivo.getCaractereCorrente()).equals("=")) {
+			relat = relat.append(arquivo.getCaractereCorrente());
+			lerCaractere(arquivo);
+			return new Token(SimboloEnum.Sig, relat.toString());
+		}
+		return null;
+	}
+	
+	private Token trataPontuacao(Arquivo arquivo) {
+		String arit = new String();
+		arit = String.valueOf(arquivo.getCaractereCorrente());
+		Token token = new Token();
+		token.setLexema(arit);
+		if(arit.matches("[\\.]")) {
+			token.setSimbolo(SimboloEnum.Sponto);
+		} else if(arit.matches("[\\;]")) {
+			token.setSimbolo(SimboloEnum.Sponto_virgula);
+		} else if(arit.matches("[\\,]")) {
+			token.setSimbolo(SimboloEnum.Svirgula);
 		}
 		lerCaractere(arquivo);
 		return token;

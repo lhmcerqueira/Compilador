@@ -29,6 +29,15 @@ public enum SimboloEnum {
 	Smais("Smais"),
 	Smenos("Smenos"),
 	Smult("Smult"),
+	Smenorig("Smenorig"),
+	Smenor("Smenor"),
+	Smaiorig("Smaiorig"),
+	Smaior("Smaior"),
+	Sdif("Sdif"),
+	Sig("Sig"),
+	Sponto("Sponto"),
+	Sponto_virgula("Sponto_virgula"),
+	Svirgula("Svirgula"),
 	Serro("Serro");
 	private String simbolo;
 	
