@@ -25,28 +25,9 @@ public class Compilador {
 	
 	//TODO mudar o retorno do método conforme a necessidade
 	public void compila(Arquivo arquivo) {
-		try {
 			arquivo.lerCaractere();
-		} catch (FimInesperadoDoArquivoException e1) {
-			trataFimInesperadoDeArquivo(arquivo);
-		}
-		while(!arquivo.fimDoArquivo()&&listaToken.size()<6) {
-			try {
+		while(!arquivo.fimDoArquivo()) {
 				listaToken.add(analisadorLexico.analiseLexical(arquivo));
-			} catch (FimInesperadoDoArquivoException e) {
-				trataFimInesperadoDeArquivo(arquivo);
-				break;
-			}
 		}
 	}
-
-	private void trataFimInesperadoDeArquivo(Arquivo arquivo) {
-		Token token = new Token();
-		token.setLexema("O programa terminou antes do esperado na linha "+
-		arquivo.getLinhaCorrente()+" no caractere "+arquivo.getIndiceCorrente());
-		token.setSimbolo(SimboloEnum.Serro);
-		listaToken = new ArrayList<>();
-		listaToken.add(token);
-	}
-
 }

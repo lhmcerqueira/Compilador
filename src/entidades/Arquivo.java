@@ -55,13 +55,13 @@ public class Arquivo {
 		this.linhaCorrente++;
 	}
 	
-	public void lerCaractere() throws FimInesperadoDoArquivoException {
+	public void lerCaractere() {
 		int indiceRequisitado = getIndiceCorrente();
 		incrementaIndice();
 		try {
 			this.caractereCorrente = this.arquivo.charAt(indiceRequisitado);
 		}catch (StringIndexOutOfBoundsException e) {
-			throw new FimInesperadoDoArquivoException(e);
+			this.caractereCorrente = '\0';
 		}
 	}
 	

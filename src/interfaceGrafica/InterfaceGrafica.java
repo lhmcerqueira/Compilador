@@ -61,19 +61,19 @@ public class InterfaceGrafica {
 	 */
 	protected void createContents() {
 		shell = new Shell();
-		shell.setSize(797, 573);
+		shell.setSize(826, 573);
 		shell.setText("SWT Application");
 		
 		text = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		text.setBounds(10, 10, 535, 346);
 		
 		tabelaToken = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
-		tabelaToken.setBounds(10, 411, 535, 113);
+		tabelaToken.setBounds(582, 24, 161, 332);
 		tabelaToken.setHeaderVisible(true);
 		tabelaToken.setLinesVisible(true);
 		
 		lblListaDeTokens = new Label(shell, SWT.NONE);
-		lblListaDeTokens.setBounds(10, 390, 85, 15);
+		lblListaDeTokens.setBounds(594, 3, 85, 15);
 		lblListaDeTokens.setText("Lista de Tokens");
 		String[] legendaTabelaToken = {"Lexema","Simbolo"};
 		for (int i = 0; i < legendaTabelaToken.length; i++) {
@@ -98,7 +98,7 @@ public class InterfaceGrafica {
 				}
 			}
 		});
-		btnCompilar.setBounds(10, 362, 75, 25);
+		btnCompilar.setBounds(136, 359, 75, 25);
 		btnCompilar.setText("Compilar");
 		
 		btnAbrirCdigoFnte = new Button(shell, SWT.NONE);
@@ -115,7 +115,7 @@ public class InterfaceGrafica {
 				
 			}
 		});
-		btnAbrirCdigoFnte.setBounds(551, 8, 110, 25);
+		btnAbrirCdigoFnte.setBounds(10, 359, 110, 25);
 		btnAbrirCdigoFnte.setText("Abrir c\u00F3digo fonte");
 		
 	
