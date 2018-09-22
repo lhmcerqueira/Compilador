@@ -1,6 +1,7 @@
 package interfaceGrafica;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,7 +15,7 @@ import compilador.Compilador;
 import entidades.Arquivo;
 import entidades.Token;
 import enums.SimboloEnum;
-import utils.AbridorDeArquivos;
+import utils.GerenciadorDeArquivos;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -70,7 +71,7 @@ public class InterfaceGrafica {
 		text.setBounds(10, 10, 535, 346);
 		
 		tabelaToken = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
-		tabelaToken.setBounds(582, 24, 197, 438);
+		tabelaToken.setBounds(582, 24, 218, 438);
 		tabelaToken.setHeaderVisible(true);
 		tabelaToken.setLinesVisible(true);
 		
@@ -120,7 +121,7 @@ public class InterfaceGrafica {
 		btnAbrirCdigoFnte.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				AbridorDeArquivos abridorDeArquivos = new AbridorDeArquivos();
+				GerenciadorDeArquivos abridorDeArquivos = new GerenciadorDeArquivos();
 				 try {
 					text.setText(abridorDeArquivos.abrirArquivo());
 				} catch (FileNotFoundException e1) {
@@ -135,6 +136,22 @@ public class InterfaceGrafica {
 		
 		textResultado = new Text(shell, SWT.BORDER);
 		textResultado.setBounds(10, 406, 535, 56);
+		
+		Button btnSalvarArquivo = new Button(shell, SWT.NONE);
+		btnSalvarArquivo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				GerenciadorDeArquivos abridorDeArquivos = new GerenciadorDeArquivos();
+				try {
+					abridorDeArquivos.salvarArquivo(text.getText());
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnSalvarArquivo.setBounds(227, 359, 85, 25);
+		btnSalvarArquivo.setText("Salvar arquivo");
 		
 	
 

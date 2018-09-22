@@ -2,13 +2,15 @@ package utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 import javax.swing.JFileChooser;
 
 import entidades.Arquivo;
 
-public class AbridorDeArquivos {
+public class GerenciadorDeArquivos {
 
 	/**
 	 * Metodo que abre o arquivo selecionado, ele usa o componente
@@ -34,5 +36,14 @@ public class AbridorDeArquivos {
 			strbldr.append("Nenhum arquivo selecionado.");
 		}
 		return strbldr.toString();	
+	}
+	
+	public void salvarArquivo(String arquivo) throws IOException {
+		JFileChooser  jFileChooser = new JFileChooser();
+		if(jFileChooser.showSaveDialog(null) == jFileChooser.APPROVE_OPTION) {
+			   FileWriter fw = new FileWriter(jFileChooser.getSelectedFile());
+	            fw.write(arquivo);
+	            fw.close();
+		}
 	}
 }
