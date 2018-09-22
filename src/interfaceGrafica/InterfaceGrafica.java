@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Text;
 import compilador.Compilador;
 import entidades.Arquivo;
 import entidades.Token;
+import enums.SimboloEnum;
 import utils.AbridorDeArquivos;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -27,6 +28,7 @@ public class InterfaceGrafica {
 	Arquivo arquivo;
 	private Table tabelaToken;
 	private Label lblListaDeTokens;
+	private Text textResultado;
 
 	/**
 	 * Launch the application.
@@ -68,7 +70,7 @@ public class InterfaceGrafica {
 		text.setBounds(10, 10, 535, 346);
 		
 		tabelaToken = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
-		tabelaToken.setBounds(582, 24, 161, 332);
+		tabelaToken.setBounds(582, 24, 197, 438);
 		tabelaToken.setHeaderVisible(true);
 		tabelaToken.setLinesVisible(true);
 		
@@ -85,16 +87,29 @@ public class InterfaceGrafica {
 		btnCompilar.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				boolean contemErro = false;
 				arquivo = new Arquivo(' ',0,text.getText().length(),0,text.getText());
 				Compilador compilador = new Compilador();
 				compilador.compila(arquivo);
+				tabelaToken.removeAll();
 				for(Token token : compilador.getListaToken()) {
 					TableItem item = new TableItem(tabelaToken, SWT.NULL);
 					item.setText(0,token.getLexema());
 					item.setText(1, token.getSimbolo().getSimbolo());
+					if(token.getSimbolo().equals(SimboloEnum.Serro)) {
+						contemErro = true;
+					}
 				}
 				for (int i = 0; i < legendaTabelaToken.length; i++) {
 					tabelaToken.getColumn(i).pack();
+				}
+				if(contemErro) {
+					textResultado.setText("Erro encontrado na linha "
+				+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
+							+arquivo.getIndiceCorrente()+", \n"+
+				"caractere encontrado = "+arquivo.getCaractereCorrente());
+				} else {
+					textResultado.setText("Programa compilado com sucesso!");
 				}
 			}
 		});
@@ -117,6 +132,9 @@ public class InterfaceGrafica {
 		});
 		btnAbrirCdigoFnte.setBounds(10, 359, 110, 25);
 		btnAbrirCdigoFnte.setText("Abrir c\u00F3digo fonte");
+		
+		textResultado = new Text(shell, SWT.BORDER);
+		textResultado.setBounds(10, 406, 535, 56);
 		
 	
 

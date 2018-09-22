@@ -6,6 +6,8 @@ import enums.SimboloEnum;
 
 public class AnalisadorLexico {
 	
+	private static final String PONTUACAO = "[\\.\\;\\,\\(\\)]";
+	private static final String OPERADOR_RELACIONAL = "[\\<\\>\\!\\=]";
 	private static final String OPERADOR_ARITIMETICO = "[\\+\\-\\*]";
 	private static final String DOIS_PONTOS = ":";
 	private static final String LETRA_DIGITO_SUBLINHADO = "[a-zA-Z0-9_]";
@@ -15,7 +17,7 @@ public class AnalisadorLexico {
 	public Token analiseLexical(Arquivo arquivo) {
 		
 		while(!arquivo.fimDoArquivo()) {
-			while((arquivo.getCaractereCorrente()=='{'||arquivo.getCaractereCorrente()==' ')&& !arquivo.fimDoArquivo()) {
+			while((arquivo.getCaractereCorrente()=='{'||arquivo.getCaractereCorrente()==' '|| arquivo.getCaractereCorrente()=='\n'|| arquivo.getCaractereCorrente()=='\r')&& !arquivo.fimDoArquivo()) {
 				if(arquivo.getCaractereCorrente()=='{') {
 					while(arquivo.getCaractereCorrente()!='}' && !arquivo.fimDoArquivo()) {
 						lerCaractere(arquivo);
@@ -25,13 +27,19 @@ public class AnalisadorLexico {
 				while(arquivo.getCaractereCorrente()==' ') {
 					lerCaractere(arquivo);
 				}
+				while(arquivo.getCaractereCorrente()=='\r'|| arquivo.getCaractereCorrente()=='\n') {
+					if(arquivo.getCaractereCorrente()=='\n') {
+						arquivo.incrementaLinha();
+					}
+					lerCaractere(arquivo);
+				}
 			}
 			if(!arquivo.fimDoArquivo()) {
 				return pegaToken(arquivo);
 			}
 		}
 		
-		return null;
+		return new Token();
 	}
 
 	private Token pegaToken(Arquivo arquivo) {
@@ -45,12 +53,13 @@ public class AnalisadorLexico {
 			return trataAtribuicao(arquivo);
 		} else if(valorStringDoCaractere.matches(OPERADOR_ARITIMETICO)) {
 			return trataOperadorAritimetico(arquivo);
-		} else if(valorStringDoCaractere.matches("[\\<\\>\\!\\=]")) {
+		} else if(valorStringDoCaractere.matches(OPERADOR_RELACIONAL)) {
 			return trataOperadorRelacional(arquivo);
-		} else if(valorStringDoCaractere.matches("[\\.\\;\\,]")) {
+		} else if(valorStringDoCaractere.matches(PONTUACAO)) {
 			return trataPontuacao(arquivo);
 		}
-		return null;
+		//TRATAR O ERRO NO RETORNO DO ARQUIVO
+		return new Token(SimboloEnum.Serro,valorStringDoCaractere);
 	}
 	
 	private Token trataDigito(Arquivo arquivo) {
@@ -226,7 +235,11 @@ public class AnalisadorLexico {
 			token.setSimbolo(SimboloEnum.Sponto_virgula);
 		} else if(arit.matches("[\\,]")) {
 			token.setSimbolo(SimboloEnum.Svirgula);
-		}
+		} else if(arit.matches("[\\(]")) {
+			token.setSimbolo(SimboloEnum.Sabre_parenteses);
+		} else if(arit.matches("[\\)]")) {
+			token.setSimbolo(SimboloEnum.Sfecha_parenteses);
+		} 
 		lerCaractere(arquivo);
 		return token;
 	}

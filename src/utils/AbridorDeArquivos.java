@@ -26,7 +26,7 @@ public class AbridorDeArquivos {
 			Scanner input = new Scanner(file);
 			while(input.hasNext()) {
 				//linhas sendo armazendas
-				strbldr = strbldr.append(input.nextLine());
+				strbldr = strbldr.append(input.nextLine()).append('\n');
 			}
 			
 			input.close();	

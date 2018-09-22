@@ -27,7 +27,13 @@ public class Compilador {
 	public void compila(Arquivo arquivo) {
 			arquivo.lerCaractere();
 		while(!arquivo.fimDoArquivo()) {
-				listaToken.add(analisadorLexico.analiseLexical(arquivo));
+			Token token = analisadorLexico.analiseLexical(arquivo);
+				if(token != null && token.getLexema()!=null && token.getSimbolo()!=null) {
+					listaToken.add(token);
+					if(token.getSimbolo().equals(SimboloEnum.Serro)) {
+						break;
+					}
+				}
 		}
 	}
 }

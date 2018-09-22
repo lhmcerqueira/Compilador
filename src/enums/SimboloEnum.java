@@ -38,6 +38,8 @@ public enum SimboloEnum {
 	Sponto("Sponto"),
 	Sponto_virgula("Sponto_virgula"),
 	Svirgula("Svirgula"),
+	Sabre_parenteses("Sabre_parenteses"),
+	Sfecha_parenteses("Sfecha_parenteses"),
 	Serro("Serro");
 	private String simbolo;
 	
