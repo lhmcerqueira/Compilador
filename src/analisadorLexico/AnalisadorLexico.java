@@ -14,7 +14,7 @@ public class AnalisadorLexico {
 	private static final String LETRA = "[a-zA-Z]";
 	private static final String DIGITO = "\\d";
 			/*
-			 * tratar tab, tratar comentário tratar exclamação
+			 * tratar tab, tratar comentï¿½rio tratar exclamaï¿½ï¿½o
 			 */
 	public Token analiseLexical(Arquivo arquivo) {
 		
@@ -25,6 +25,10 @@ public class AnalisadorLexico {
 						lerCaractere(arquivo);
 					}
 					lerCaractere(arquivo);
+					if(arquivo.fimDoArquivo()) {
+						//TRATAR O ERRO NO RETORNO DO ARQUIVO
+						return new Token(SimboloEnum.Serro,String.valueOf(arquivo.getCaractereCorrente()));
+					}
 				}
 				while(arquivo.getCaractereCorrente()==' ') {
 					lerCaractere(arquivo);
@@ -215,8 +219,11 @@ public class AnalisadorLexico {
 				relat = relat.append(arquivo.getCaractereCorrente());
 				lerCaractere(arquivo);
 				return new Token(SimboloEnum.Sdif, relat.toString());
+			}else {
+				//TRATAR O ERRO NO RETORNO DO ARQUIVO
+				return new Token(SimboloEnum.Serro,String.valueOf(arquivo.getCaractereCorrente()));
 			}
-			return null;
+			
 		} 
 		if(String.valueOf(arquivo.getCaractereCorrente()).equals("=")) {
 			relat = relat.append(arquivo.getCaractereCorrente());
