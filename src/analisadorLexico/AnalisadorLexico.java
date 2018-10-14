@@ -13,7 +13,9 @@ public class AnalisadorLexico {
 	private static final String LETRA_DIGITO_SUBLINHADO = "[a-zA-Z0-9_]";
 	private static final String LETRA = "[a-zA-Z]";
 	private static final String DIGITO = "\\d";
-			
+			/*
+			 * tratar tab, tratar comentário tratar exclamação
+			 */
 	public Token analiseLexical(Arquivo arquivo) {
 		
 		while(!arquivo.fimDoArquivo()) {
