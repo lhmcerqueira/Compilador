@@ -3,6 +3,8 @@ package analisadorLexico;
 import entidades.Arquivo;
 import entidades.Token;
 import enums.SimboloEnum;
+import exceptions.CaractereNaoEsperadoEncontradoException;
+import exceptions.FimInesperadoDoArquivoException;
 
 public class AnalisadorLexico {
 	
@@ -16,7 +18,7 @@ public class AnalisadorLexico {
 			/*
 			 * tratar tab, tratar coment�rio tratar exclama��o
 			 */
-	public Token analiseLexical(Arquivo arquivo) {
+	public Token analiseLexical(Arquivo arquivo) throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
 		
 		while(!arquivo.fimDoArquivo()) {
 			while((arquivo.getCaractereCorrente()=='{'||arquivo.getCaractereCorrente()==' '|| arquivo.getCaractereCorrente()=='\n'|| arquivo.getCaractereCorrente()=='\r')&& !arquivo.fimDoArquivo()) {
@@ -27,7 +29,7 @@ public class AnalisadorLexico {
 					lerCaractere(arquivo);
 					if(arquivo.fimDoArquivo()) {
 						//TRATAR O ERRO NO RETORNO DO ARQUIVO
-						return new Token(SimboloEnum.Serro,String.valueOf(arquivo.getCaractereCorrente()));
+						throw new FimInesperadoDoArquivoException("falta }");
 					}
 				}
 				while(arquivo.getCaractereCorrente()==' ') {
@@ -48,7 +50,7 @@ public class AnalisadorLexico {
 		return new Token();
 	}
 
-	private Token pegaToken(Arquivo arquivo) {
+	private Token pegaToken(Arquivo arquivo) throws CaractereNaoEsperadoEncontradoException {
 		
 		String valorStringDoCaractere = String.valueOf(arquivo.getCaractereCorrente());
 		if(valorStringDoCaractere.matches(DIGITO)) {
@@ -65,7 +67,8 @@ public class AnalisadorLexico {
 			return trataPontuacao(arquivo);
 		}
 		//TRATAR O ERRO NO RETORNO DO ARQUIVO
-		return new Token(SimboloEnum.Serro,valorStringDoCaractere);
+		throw new CaractereNaoEsperadoEncontradoException(valorStringDoCaractere);
+		
 	}
 	
 	private Token trataDigito(Arquivo arquivo) {
@@ -186,7 +189,7 @@ public class AnalisadorLexico {
 		return token;
 	}
 	
-	private Token trataOperadorRelacional(Arquivo arquivo) {
+	private Token trataOperadorRelacional(Arquivo arquivo) throws CaractereNaoEsperadoEncontradoException {
 		StringBuilder relat = new StringBuilder();
 
 		if(String.valueOf(arquivo.getCaractereCorrente()).matches("[\\<]")) {
@@ -221,7 +224,7 @@ public class AnalisadorLexico {
 				return new Token(SimboloEnum.Sdif, relat.toString());
 			}else {
 				//TRATAR O ERRO NO RETORNO DO ARQUIVO
-				return new Token(SimboloEnum.Serro,String.valueOf(arquivo.getCaractereCorrente()));
+				throw new CaractereNaoEsperadoEncontradoException("! sem =");
 			}
 			
 		} 

@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Text;
 import compilador.Compilador;
 import entidades.Arquivo;
 import entidades.Token;
+import entidades.TokenErro;
 import enums.SimboloEnum;
 import utils.GerenciadorDeArquivos;
 import org.eclipse.swt.widgets.Table;
@@ -89,6 +90,7 @@ public class InterfaceGrafica {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				boolean contemErro = false;
+				String erro = new String();
 				arquivo = new Arquivo(' ',0,text.getText().length(),0,text.getText());
 				Compilador compilador = new Compilador();
 				compilador.compila(arquivo);
@@ -99,6 +101,8 @@ public class InterfaceGrafica {
 					item.setText(1, token.getSimbolo().getSimbolo());
 					if(token.getSimbolo().equals(SimboloEnum.Serro)) {
 						contemErro = true;
+						TokenErro tokenErro = (TokenErro) token;
+						erro = tokenErro.getErro()+" "+ tokenErro.getLexema();
 					}
 				}
 				for (int i = 0; i < legendaTabelaToken.length; i++) {
@@ -108,7 +112,7 @@ public class InterfaceGrafica {
 					textResultado.setText("Erro encontrado na linha "
 				+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
 							+arquivo.getIndiceCorrente()+", \n"+
-				"caractere encontrado = "+arquivo.getCaractereCorrente());
+				 erro);
 				} else {
 					textResultado.setText("Programa compilado com sucesso!");
 				}
