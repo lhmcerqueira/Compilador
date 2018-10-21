@@ -16,6 +16,7 @@ import entidades.Arquivo;
 import entidades.Token;
 import entidades.TokenErro;
 import enums.SimboloEnum;
+import exceptions.ErroSintaticoException;
 import utils.GerenciadorDeArquivos;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -89,18 +90,24 @@ public class InterfaceGrafica {
 		btnCompilar.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				boolean contemErro = false;
+				boolean contemErroLexico = false;
+				boolean contemErroSintatico = false;
 				String erro = new String();
 				arquivo = new Arquivo(' ',0,text.getText().length(),0,text.getText());
 				Compilador compilador = new Compilador();
-				compilador.compila(arquivo);
+				try {
+					compilador.compila(arquivo);
+				} catch (ErroSintaticoException e1) {
+					contemErroSintatico = true;
+					erro = e1.getMessage();
+				}
 				tabelaToken.removeAll();
 				for(Token token : compilador.getListaToken()) {
 					TableItem item = new TableItem(tabelaToken, SWT.NULL);
 					item.setText(0,token.getLexema());
 					item.setText(1, token.getSimbolo().getSimbolo());
 					if(token.getSimbolo().equals(SimboloEnum.Serro)) {
-						contemErro = true;
+						contemErroLexico = true;
 						TokenErro tokenErro = (TokenErro) token;
 						erro = tokenErro.getErro()+" "+ tokenErro.getLexema();
 					}
@@ -108,11 +115,13 @@ public class InterfaceGrafica {
 				for (int i = 0; i < legendaTabelaToken.length; i++) {
 					tabelaToken.getColumn(i).pack();
 				}
-				if(contemErro) {
+				if(contemErroLexico) {
 					textResultado.setText("Erro encontrado na linha "
 				+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
 							+arquivo.getIndiceCorrente()+", \n"+
 				 erro);
+				} else if(contemErroSintatico){
+					textResultado.setText(erro);
 				} else {
 					textResultado.setText("Programa compilado com sucesso!");
 				}
