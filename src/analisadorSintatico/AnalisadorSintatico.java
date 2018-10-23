@@ -54,6 +54,7 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		pegaToken(arquivo, listaToken);
 		analisaEtapaVariaveis(arquivo, listaToken);
+		analisaSubrotinas(arquivo, listaToken);
 	}
 
 	private void analisaEtapaVariaveis(Arquivo arquivo, List<Token> listaToken)
@@ -101,7 +102,8 @@ public class AnalisadorSintatico {
 		analisaTipo(arquivo, listaToken);
 	}
 
-	private void analisaTipo(Arquivo arquivo, List<Token> listaToken) throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+	private void analisaTipo(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		if (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sinteiro)
 				&& !tokenCorrente.getSimbolo().equals(SimboloEnum.Sbooleano)) {
 			throw new ErroSintaticoException("declaração incorreta de variáveis: Tipo errado de variável.");
@@ -109,19 +111,16 @@ public class AnalisadorSintatico {
 		pegaToken(arquivo, listaToken);
 	}
 
-	private void analisaSubRotinas(Arquivo arquivo, List<Token> listaToken) {
-
-	}
-
-	private void analisaComandos(Arquivo arquivo, List<Token> listaToken) throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
-		if(tokenCorrente.getSimbolo().equals(SimboloEnum.Sinteiro)) {
+	private void analisaComandos(Arquivo arquivo, List<Token> listaToken)
+			throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sinteiro)) {
 			pegaToken(arquivo, listaToken);
 			analisaComandoSimples(arquivo, listaToken);
-			while(!tokenCorrente.getSimbolo().equals(SimboloEnum.Sfim)) {
-				if(tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
+			while (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sfim)) {
+				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 					pegaToken(arquivo, listaToken);
-					if(!tokenCorrente.getSimbolo().equals(SimboloEnum.Sfim)) {
-						//TODO analisa comando simples
+					if (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sfim)) {
+						analisaComandoSimples(arquivo, listaToken);
 					}
 				} else {
 					throw new ErroSintaticoException("Ponto e vírgula faltando.");
@@ -132,22 +131,225 @@ public class AnalisadorSintatico {
 		}
 	}
 
-	private void analisaComandoSimples(Arquivo arquivo, List<Token> listaToken) throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
-		if(tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-			
-		} else if(tokenCorrente.getSimbolo().equals(SimboloEnum.Sse)) {
-			
-		} else if(tokenCorrente.getSimbolo().equals(SimboloEnum.Senquanto)) {
-			
-		} else if(tokenCorrente.getSimbolo().equals(SimboloEnum.Sleia)) {
-			
-		} else if(tokenCorrente.getSimbolo().equals(SimboloEnum.Sescreva)) {
-			
-		}  else {
+	private void analisaComandoSimples(Arquivo arquivo, List<Token> listaToken)
+			throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
+			analisaAtribuicaoChamadaDeProcedimento(arquivo, listaToken);
+		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sse)) {
+			analisaSe(arquivo, listaToken);
+		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Senquanto)) {
+			analisaEnquanto(arquivo, listaToken);
+		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sleia)) {
+			analisaLeia(arquivo, listaToken);
+		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sescreva)) {
+			analisaEscreva(arquivo, listaToken);
+		} else {
 			analisaComandos(arquivo, listaToken);
 		}
 	}
-	
+
+	private void analisaAtribuicaoChamadaDeProcedimento(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
+		pegaToken(arquivo, listaToken);
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Satribuicao)) {
+			// TODO analisaAtribuicao
+		} else {
+			// TODO chamadaProcedimento
+		}
+	}
+
+	private void analisaLeia(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		pegaToken(arquivo, listaToken);
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sabre_parenteses)) {
+			pegaToken(arquivo, listaToken);
+			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
+				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfecha_parenteses)) {
+					pegaToken(arquivo, listaToken);
+				} else {
+					throw new ErroSintaticoException(") faltando.");
+				}
+			} else {
+				throw new ErroSintaticoException("Identificador do comando leia faltando.");
+			}
+		} else {
+			throw new ErroSintaticoException("( faltando.");
+		}
+	}
+
+	private void analisaEscreva(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		pegaToken(arquivo, listaToken);
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sabre_parenteses)) {
+			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
+				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfecha_parenteses)) {
+					pegaToken(arquivo, listaToken);
+				} else {
+					throw new ErroSintaticoException(") faltando.");
+				}
+			} else {
+				throw new ErroSintaticoException("Identificador do comando escreva faltando.");
+			}
+		} else {
+			throw new ErroSintaticoException("( faltando.");
+		}
+	}
+
+	private void analisaEnquanto(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		pegaToken(arquivo, listaToken);
+		// TODO analisaExpressao
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfaca)) {
+			pegaToken(arquivo, listaToken);
+			analisaComandoSimples(arquivo, listaToken);
+		} else {
+			throw new ErroSintaticoException("Comando faça faltando.");
+		}
+	}
+
+	private void analisaSe(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		pegaToken(arquivo, listaToken);
+		analisaExpressao(arquivo, listaToken);
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sentao)) {
+			pegaToken(arquivo, listaToken);
+			analisaComandoSimples(arquivo, listaToken);
+			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Ssenao)) {
+				pegaToken(arquivo, listaToken);
+				analisaComandoSimples(arquivo, listaToken);
+			}
+		} else {
+			throw new ErroSintaticoException("Comando então faltando.");
+		}
+
+	}
+
+	private void analisaSubrotinas(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		/*
+		 * int flag = 0; if
+		 * (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprocedimento) ||
+		 * tokenCorrente.getSimbolo().equals(SimboloEnum.Sfuncao)) { implementação do
+		 * semantico }
+		 */
+
+		while (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprocedimento)
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sfuncao)) {
+			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprocedimento)) {
+				analisaDeclaracaoProcedimento(arquivo, listaToken);
+			} else {
+				analisaDeclaracaoDeFuncao(arquivo, listaToken);
+			}
+			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
+				pegaToken(arquivo, listaToken);
+			} else {
+				throw new ErroSintaticoException("Ponto e vírgula faltando.");
+			}
+		}
+
+	}
+
+	private void analisaDeclaracaoProcedimento(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		pegaToken(arquivo, listaToken);
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
+			pegaToken(arquivo, listaToken);
+			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
+				analisaBloco(arquivo, listaToken);
+			} else {
+				throw new ErroSintaticoException("Ponto e vírgula faltando.");
+			}
+		} else {
+			throw new ErroSintaticoException("indentificador de procedimento faltando.");
+		}
+	}
+
+	private void analisaDeclaracaoDeFuncao(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		pegaToken(arquivo, listaToken);
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
+			pegaToken(arquivo, listaToken);
+			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos)) {
+				pegaToken(arquivo, listaToken);
+				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sinteiro)
+						|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sbooleano)) {
+					pegaToken(arquivo, listaToken);
+					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
+						analisaBloco(arquivo, listaToken);
+					} else {
+						throw new ErroSintaticoException("Ponto e vírgula faltando.");
+					}
+				} else {
+					throw new ErroSintaticoException("tipo de função faltando.");
+				}
+			} else {
+				throw new ErroSintaticoException(": faltando.");
+			}
+		} else {
+			throw new ErroSintaticoException("indentificador de função faltando.");
+		}
+	}
+
+	private void analisaExpressao(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smaior)
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smaiorig)
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenor)
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenorig)) {
+			pegaToken(arquivo, listaToken);
+			analisaExpressaoSimples(arquivo, listaToken);
+		} else {
+			throw new ErroSintaticoException("Ponto e vírgula faltando.");
+		}
+	}
+
+	private void analisaExpressaoSimples(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smais)
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenos)) {
+			pegaToken(arquivo, listaToken);
+			analisaTermo(arquivo, listaToken);
+		} else {
+			throw new ErroSintaticoException("Ponto e vírgula faltando.");
+		}
+	}
+
+	private void analisaTermo(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smult) || tokenCorrente.getSimbolo().equals(SimboloEnum.Sdiv)
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sse)) {
+			pegaToken(arquivo, listaToken);
+			analisaFator(arquivo, listaToken);
+		} else {
+			throw new ErroSintaticoException("Ponto e vírgula faltando.");
+		}
+	}
+
+	private void analisaFator(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
+			// TODO analisaChamadaFuncao(arquivo, listaToken);;
+		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snumero)) {
+			pegaToken(arquivo, listaToken);
+		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snao)) {
+			pegaToken(arquivo, listaToken);
+			analisaFator(arquivo, listaToken);
+		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sabre_parenteses)) {
+			pegaToken(arquivo, listaToken);
+			analisaExpressao(arquivo, listaToken);
+			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfecha_parenteses)) {
+				pegaToken(arquivo, listaToken);
+			} else {
+				throw new ErroSintaticoException("Falha ao detectar fator");
+			}
+		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sverdadeiro)
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sfalso)) {
+			pegaToken(arquivo, listaToken);
+		} else {
+			throw new ErroSintaticoException("Falha ao detectar fator");
+		}
+	}
+
 	private void pegaToken(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
 		tokenCorrente = analisadorLexico.analiseLexical(arquivo);
