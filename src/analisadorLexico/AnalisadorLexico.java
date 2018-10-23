@@ -97,7 +97,7 @@ public class AnalisadorLexico {
 				token.setSimbolo(SimboloEnum.Sprograma);
 				break;
 			case "se":
-				token.setSimbolo(SimboloEnum.Se);
+				token.setSimbolo(SimboloEnum.Sse);
 				break;
 			case "entao":
 				token.setSimbolo(SimboloEnum.Sentao);

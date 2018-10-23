@@ -55,6 +55,7 @@ public class AnalisadorSintatico {
 		pegaToken(arquivo, listaToken);
 		analisaEtapaVariaveis(arquivo, listaToken);
 		analisaSubrotinas(arquivo, listaToken);
+		analisaComandos(arquivo, listaToken);
 	}
 
 	private void analisaEtapaVariaveis(Arquivo arquivo, List<Token> listaToken)
@@ -97,7 +98,7 @@ public class AnalisadorSintatico {
 			} else {
 				throw new ErroSintaticoException("nome de variável não declarado.");
 			}
-		} while (tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos));
+		} while (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos));
 		pegaToken(arquivo, listaToken);
 		analisaTipo(arquivo, listaToken);
 	}
@@ -113,7 +114,7 @@ public class AnalisadorSintatico {
 
 	private void analisaComandos(Arquivo arquivo, List<Token> listaToken)
 			throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
-		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sinteiro)) {
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sinicio)) {
 			pegaToken(arquivo, listaToken);
 			analisaComandoSimples(arquivo, listaToken);
 			while (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sfim)) {
@@ -296,6 +297,7 @@ public class AnalisadorSintatico {
 
 	private void analisaExpressao(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		analisaExpressaoSimples(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smaior)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smaiorig)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenor)
@@ -303,7 +305,7 @@ public class AnalisadorSintatico {
 			pegaToken(arquivo, listaToken);
 			analisaExpressaoSimples(arquivo, listaToken);
 		} else {
-			throw new ErroSintaticoException("Ponto e vírgula faltando.");
+			throw new ErroSintaticoException("Comando se declarado incorretamente");
 		}
 	}
 
@@ -313,9 +315,14 @@ public class AnalisadorSintatico {
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenos)) {
 			pegaToken(arquivo, listaToken);
 			analisaTermo(arquivo, listaToken);
-		} else {
-			throw new ErroSintaticoException("Ponto e vírgula faltando.");
-		}
+		} 
+		analisaTermo(arquivo, listaToken);
+		while(tokenCorrente.getSimbolo().equals(SimboloEnum.Smais)
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenos)
+				||tokenCorrente.getSimbolo().equals(SimboloEnum.Sou)) {
+			pegaToken(arquivo, listaToken);
+			analisaTermo(arquivo, listaToken);		
+			}
 	}
 
 	private void analisaTermo(Arquivo arquivo, List<Token> listaToken)
