@@ -149,12 +149,16 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaAtribuicaoChamadaDeProcedimento(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Satribuicao)) {
-			// TODO analisaAtribuicao
+			//analisa atribuicao, neste caso é uma expressão e de acordo com a bnf
+			//<comando atribuicao>::= <identificador> := <expressão> 
+			//já lemos o identificador e a atribuiçao, falta apenas a expressão
+			pegaToken(arquivo, listaToken);
+			analisaExpressao(arquivo, listaToken);
 		} else {
-			// TODO chamadaProcedimento
+			analisaChamadaProcedimento(arquivo, listaToken);
 		}
 	}
 
@@ -198,7 +202,7 @@ public class AnalisadorSintatico {
 	private void analisaEnquanto(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		pegaToken(arquivo, listaToken);
-		// TODO analisaExpressao
+		analisaExpressao(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfaca)) {
 			pegaToken(arquivo, listaToken);
 			analisaComandoSimples(arquivo, listaToken);
@@ -328,7 +332,7 @@ public class AnalisadorSintatico {
 	private void analisaFator(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-			// TODO analisaChamadaFuncao(arquivo, listaToken);;
+			analisaChamadaFuncao(arquivo, listaToken);
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snumero)) {
 			pegaToken(arquivo, listaToken);
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snao)) {
@@ -350,6 +354,24 @@ public class AnalisadorSintatico {
 		}
 	}
 
+	public void analisaChamadaProcedimento(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
+			pegaToken(arquivo, listaToken);
+		} else {
+			throw new ErroSintaticoException("; faltando na chamada de procedimento.");
+		}
+	}
+
+	public void analisaChamadaFuncao(Arquivo arquivo, List<Token> listaToken)
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
+			pegaToken(arquivo, listaToken);
+		} else {
+			throw new ErroSintaticoException("; faltando na chamada de função.");
+		}
+	}
+	
 	private void pegaToken(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
 		tokenCorrente = analisadorLexico.analiseLexical(arquivo);
