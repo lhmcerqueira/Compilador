@@ -116,12 +116,15 @@ public class InterfaceGrafica {
 					tabelaToken.getColumn(i).pack();
 				}
 				if(contemErroLexico) {
-					textResultado.setText("Erro encontrado na linha "
+					textResultado.setText("Erro léxico encontrado na linha "
 				+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
 							+arquivo.getIndiceCorrente()+", \n"+
 				 erro);
 				} else if(contemErroSintatico){
-					textResultado.setText(erro);
+					textResultado.setText("Erro sintático encontrado na linha "
+							+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
+										+arquivo.getIndiceCorrente()+", \n"+
+							 erro);
 				} else {
 					textResultado.setText("Programa compilado com sucesso!");
 				}

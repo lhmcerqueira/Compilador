@@ -153,6 +153,9 @@ public class AnalisadorLexico {
 			case "nao":
 				token.setSimbolo(SimboloEnum.Snao);
 				break;
+			case "leia":
+				token.setSimbolo(SimboloEnum.Sleia);
+				break;
 			default:
 				token.setSimbolo(SimboloEnum.Sidentificador);
 				break;
