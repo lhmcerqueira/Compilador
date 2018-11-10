@@ -35,19 +35,19 @@ public class AnalisadorSintatico {
 						if (arquivo.fimDoArquivo()) {
 							return true;
 						} else {
-							throw new ErroSintaticoException("Final do Arquivo não encontrado.");
+							throw new ErroSintaticoException("Final do Arquivo nï¿½o encontrado.");
 						}
 					} else {
 						throw new ErroSintaticoException("Ponto final faltando.");
 					}
 				} else {
-					throw new ErroSintaticoException("Ponto e vírgula faltando.");
+					throw new ErroSintaticoException("Ponto e vï¿½rgula faltando.");
 				}
 			} else {
-				throw new ErroSintaticoException("Nome do programa não encontrado.");
+				throw new ErroSintaticoException("Nome do programa nï¿½o encontrado.");
 			}
 		} else {
-			throw new ErroSintaticoException("Inicio do programa não encontrado.");
+			throw new ErroSintaticoException("Inicio do programa nï¿½o encontrado.");
 		}
 	}
 
@@ -69,11 +69,11 @@ public class AnalisadorSintatico {
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 						pegaToken(arquivo, listaToken);
 					} else {
-						throw new ErroSintaticoException("Ponto e vírgula faltando.");
+						throw new ErroSintaticoException("Ponto e vï¿½rgula faltando.");
 					}
 				}
 			} else {
-				throw new ErroSintaticoException("Identificador de variável não encontrado");
+				throw new ErroSintaticoException("Identificador de variï¿½vel nï¿½o encontrado");
 			}
 		}
 	}
@@ -89,14 +89,14 @@ public class AnalisadorSintatico {
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Svirgula)) {
 						pegaToken(arquivo, listaToken);
 						if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos)) {
-							throw new ErroSintaticoException("declaração incorreta de variáveis.");
+							throw new ErroSintaticoException("declaraï¿½ï¿½o incorreta de variï¿½veis.");
 						}
 					}
 				} else {
-					throw new ErroSintaticoException("declaração incorreta de variáveis.");
+					throw new ErroSintaticoException("declaraï¿½ï¿½o incorreta de variï¿½veis.");
 				}
 			} else {
-				throw new ErroSintaticoException("nome de variável não declarado.");
+				throw new ErroSintaticoException("nome de variï¿½vel nï¿½o declarado.");
 			}
 		} while (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos));
 		pegaToken(arquivo, listaToken);
@@ -107,7 +107,7 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		if (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sinteiro)
 				&& !tokenCorrente.getSimbolo().equals(SimboloEnum.Sbooleano)) {
-			throw new ErroSintaticoException("declaração incorreta de variáveis: Tipo errado de variável.");
+			throw new ErroSintaticoException("declaraï¿½ï¿½o incorreta de variï¿½veis: Tipo errado de variï¿½vel.");
 		}
 		pegaToken(arquivo, listaToken);
 	}
@@ -124,11 +124,11 @@ public class AnalisadorSintatico {
 						analisaComandoSimples(arquivo, listaToken);
 					}
 				} else {
-					throw new ErroSintaticoException("Ponto e vírgula faltando.");
+					throw new ErroSintaticoException("Ponto e vï¿½rgula faltando.");
 				}
 			}
 		} else {
-			throw new ErroSintaticoException("declaração incorreta de comandos.");
+			throw new ErroSintaticoException("declaraï¿½ï¿½o incorreta de comandos.");
 		}
 	}
 
@@ -153,9 +153,9 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Satribuicao)) {
-			//analisa atribuicao, neste caso é uma expressão e de acordo com a bnf
-			//<comando atribuicao>::= <identificador> := <expressão> 
-			//já lemos o identificador e a atribuiçao, falta apenas a expressão
+			//analisa atribuicao, neste caso ï¿½ uma expressï¿½o e de acordo com a bnf
+			//<comando atribuicao>::= <identificador> := <expressï¿½o> 
+			//jï¿½ lemos o identificador e a atribuiï¿½ao, falta apenas a expressï¿½o
 			pegaToken(arquivo, listaToken);
 			analisaExpressao(arquivo, listaToken);
 		} else {
@@ -211,7 +211,7 @@ public class AnalisadorSintatico {
 			pegaToken(arquivo, listaToken);
 			analisaComandoSimples(arquivo, listaToken);
 		} else {
-			throw new ErroSintaticoException("Comando faça faltando.");
+			throw new ErroSintaticoException("Comando faï¿½a faltando.");
 		}
 	}
 
@@ -227,7 +227,7 @@ public class AnalisadorSintatico {
 				analisaComandoSimples(arquivo, listaToken);
 			}
 		} else {
-			throw new ErroSintaticoException("Comando então faltando.");
+			throw new ErroSintaticoException("Comando entï¿½o faltando.");
 		}
 
 	}
@@ -237,7 +237,7 @@ public class AnalisadorSintatico {
 		/*
 		 * int flag = 0; if
 		 * (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprocedimento) ||
-		 * tokenCorrente.getSimbolo().equals(SimboloEnum.Sfuncao)) { implementação do
+		 * tokenCorrente.getSimbolo().equals(SimboloEnum.Sfuncao)) { implementaï¿½ï¿½o do
 		 * semantico }
 		 */
 
@@ -251,7 +251,7 @@ public class AnalisadorSintatico {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 				pegaToken(arquivo, listaToken);
 			} else {
-				throw new ErroSintaticoException("Ponto e vírgula faltando.");
+				throw new ErroSintaticoException("Ponto e vï¿½rgula faltando.");
 			}
 		}
 
@@ -265,7 +265,7 @@ public class AnalisadorSintatico {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 				analisaBloco(arquivo, listaToken);
 			} else {
-				throw new ErroSintaticoException("Ponto e vírgula faltando.");
+				throw new ErroSintaticoException("Ponto e vï¿½rgula faltando.");
 			}
 		} else {
 			throw new ErroSintaticoException("indentificador de procedimento faltando.");
@@ -285,16 +285,16 @@ public class AnalisadorSintatico {
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 						analisaBloco(arquivo, listaToken);
 					} else {
-						throw new ErroSintaticoException("Ponto e vírgula faltando.");
+						throw new ErroSintaticoException("Ponto e vï¿½rgula faltando.");
 					}
 				} else {
-					throw new ErroSintaticoException("tipo de função faltando.");
+					throw new ErroSintaticoException("tipo de funï¿½ï¿½o faltando.");
 				}
 			} else {
 				throw new ErroSintaticoException(": faltando.");
 			}
 		} else {
-			throw new ErroSintaticoException("indentificador de função faltando.");
+			throw new ErroSintaticoException("indentificador de funï¿½ï¿½o faltando.");
 		}
 	}
 
@@ -316,7 +316,6 @@ public class AnalisadorSintatico {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smais)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenos)) {
 			pegaToken(arquivo, listaToken);
-			analisaTermo(arquivo, listaToken);
 		} 
 		analisaTermo(arquivo, listaToken);
 		while(tokenCorrente.getSimbolo().equals(SimboloEnum.Smais)
@@ -335,6 +334,7 @@ public class AnalisadorSintatico {
 			pegaToken(arquivo, listaToken);
 			analisaFator(arquivo, listaToken);
 		} 
+
 	}
 
 	private void analisaFator(Arquivo arquivo, List<Token> listaToken)
@@ -373,6 +373,7 @@ public class AnalisadorSintatico {
 	public void analisaChamadaFuncao(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		pegaToken(arquivo, listaToken);
+
 	}
 	
 	private void pegaToken(Arquivo arquivo, List<Token> listaToken)
