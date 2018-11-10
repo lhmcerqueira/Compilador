@@ -127,6 +127,7 @@ public class AnalisadorSintatico {
 					throw new ErroSintaticoException("Ponto e vï¿½rgula faltando.");
 				}
 			}
+			pegaToken(arquivo, listaToken);
 		} else {
 			throw new ErroSintaticoException("declaraï¿½ï¿½o incorreta de comandos.");
 		}
@@ -362,12 +363,7 @@ public class AnalisadorSintatico {
 
 	public void analisaChamadaProcedimento(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
-		pegaToken(arquivo, listaToken);
-		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
-			pegaToken(arquivo, listaToken);
-		} else {
-			throw new ErroSintaticoException("ponto e vírgula faltando na chamada de procedimento.");
-		}
+		
 	}
 
 	public void analisaChamadaFuncao(Arquivo arquivo, List<Token> listaToken)
