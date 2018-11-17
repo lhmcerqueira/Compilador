@@ -1,4 +1,4 @@
-package analisadorLexico;
+package compilador;
 
 import entidades.Arquivo;
 import entidades.Token;

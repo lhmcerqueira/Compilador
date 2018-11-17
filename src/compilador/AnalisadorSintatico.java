@@ -1,8 +1,7 @@
-package analisadorSintatico;
+package compilador;
 
 import java.util.List;
 
-import analisadorLexico.AnalisadorLexico;
 import entidades.Arquivo;
 import entidades.Token;
 import enums.SimboloEnum;

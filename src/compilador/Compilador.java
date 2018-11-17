@@ -3,8 +3,6 @@ package compilador;
 import java.util.ArrayList;
 import java.util.List;
 
-import analisadorLexico.AnalisadorLexico;
-import analisadorSintatico.AnalisadorSintatico;
 import entidades.Arquivo;
 import entidades.Token;
 import entidades.TokenErro;
