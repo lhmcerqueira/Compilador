@@ -16,6 +16,7 @@ import entidades.Arquivo;
 import entidades.Token;
 import entidades.TokenErro;
 import enums.SimboloEnum;
+import exceptions.ErroSemanticoException;
 import exceptions.ErroSintaticoException;
 import utils.GerenciadorDeArquivos;
 import org.eclipse.swt.widgets.Table;
@@ -92,6 +93,8 @@ public class InterfaceGrafica {
 			public void widgetSelected(SelectionEvent e) {
 				boolean contemErroLexico = false;
 				boolean contemErroSintatico = false;
+				boolean contemErroSemantico = false;
+
 				String erro = new String();
 				arquivo = new Arquivo(' ',0,text.getText().length(),0,text.getText());
 				Compilador compilador = new Compilador();
@@ -99,6 +102,9 @@ public class InterfaceGrafica {
 					compilador.compila(arquivo);
 				} catch (ErroSintaticoException e1) {
 					contemErroSintatico = true;
+					erro = e1.getMessage();
+				} catch (ErroSemanticoException e1) {
+					contemErroSemantico= true;
 					erro = e1.getMessage();
 				}
 				tabelaToken.removeAll();
@@ -125,7 +131,12 @@ public class InterfaceGrafica {
 							+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
 										+arquivo.getIndiceCorrente()+", \n"+
 							 erro);
-				} else {
+				} else if(contemErroSemantico){
+					textResultado.setText("Erro semântico encontrado na linha "
+							+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
+										+arquivo.getIndiceCorrente()+", \n"+
+							 erro);
+				}else {
 					textResultado.setText("Programa compilado com sucesso!");
 				}
 			}

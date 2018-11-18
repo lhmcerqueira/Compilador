@@ -7,9 +7,9 @@ public class Simbolo {
 	private String lexema;
 	private TipoTabelaSimboloEnum tipo;
 	private NivelTabelaSimbolo nivel;
-	private int rotulo;
+	private Integer rotulo;
 
-	public Simbolo(String lexema, TipoTabelaSimboloEnum tipo, NivelTabelaSimbolo nivel, int rotulo) {
+	public Simbolo(String lexema, TipoTabelaSimboloEnum tipo, NivelTabelaSimbolo nivel, Integer rotulo) {
 		super();
 		this.lexema = lexema;
 		this.tipo = tipo;
@@ -47,11 +47,11 @@ public class Simbolo {
 		this.nivel = nivel;
 	}
 
-	public int getRotulo() {
+	public Integer getRotulo() {
 		return rotulo;
 	}
 
-	public void setRotulo(int rotulo) {
+	public void setRotulo(Integer rotulo) {
 		this.rotulo = rotulo;
 	}
 	

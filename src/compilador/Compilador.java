@@ -8,6 +8,7 @@ import entidades.Token;
 import entidades.TokenErro;
 import enums.SimboloEnum;
 import exceptions.CaractereNaoEsperadoEncontradoException;
+import exceptions.ErroSemanticoException;
 import exceptions.ErroSintaticoException;
 import exceptions.FimInesperadoDoArquivoException;
 
@@ -24,7 +25,7 @@ public class Compilador {
 		return this.listaToken;
 	}
 
-	public void compila(Arquivo arquivo) throws ErroSintaticoException {
+	public void compila(Arquivo arquivo) throws ErroSintaticoException, ErroSemanticoException {
 		arquivo.lerCaractere();
 			try {
 				analisadorSintatico.analisaSintatico(arquivo, listaToken);

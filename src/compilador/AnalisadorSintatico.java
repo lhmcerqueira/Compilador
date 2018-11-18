@@ -4,27 +4,31 @@ import java.util.List;
 
 import entidades.Arquivo;
 import entidades.Token;
+import enums.NivelTabelaSimbolo;
 import enums.SimboloEnum;
+import enums.TipoTabelaSimboloEnum;
 import exceptions.CaractereNaoEsperadoEncontradoException;
+import exceptions.ErroSemanticoException;
 import exceptions.ErroSintaticoException;
 import exceptions.FimInesperadoDoArquivoException;
 
 public class AnalisadorSintatico {
 
 	private AnalisadorLexico analisadorLexico;
+	private AnalisadorSemantico analisadorSemantico;
 	private Token tokenCorrente;
-
 	public AnalisadorSintatico() {
 		this.analisadorLexico = new AnalisadorLexico();
+		this.analisadorSemantico = new AnalisadorSemantico();
 	}
 
 	public boolean analisaSintatico(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprograma)) {
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-				//TODO insereTabela(token.lexema,"nomedeprograma","","");
+				insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.NOME_DE_PROGRAMA, null,null);
 				pegaToken(arquivo, listaToken);
 				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 					analisaBloco(arquivo, listaToken);
@@ -51,7 +55,7 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaBloco(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		pegaToken(arquivo, listaToken);
 		analisaEtapaVariaveis(arquivo, listaToken);
 		analisaSubrotinas(arquivo, listaToken);
@@ -59,7 +63,7 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaEtapaVariaveis(Arquivo arquivo, List<Token> listaToken)
-			throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
+			throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSemanticoException {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Svar)) {
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
@@ -78,11 +82,12 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaVariaveis(Arquivo arquivo, List<Token> listaToken)
-			throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
+			throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSemanticoException {
 		do {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-				//TODO pesquisa na tabela a duplicicade de símbolos de variáveis
-				pegaToken(arquivo, listaToken);
+				if(!pesquisaDuplicidadeVariaveisTabela(tokenCorrente.getLexema())) {
+					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null,null);
+					pegaToken(arquivo, listaToken);
 				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Svirgula)
 						|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos)) {
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Svirgula)) {
@@ -94,6 +99,9 @@ public class AnalisadorSintatico {
 				} else {
 					throw new ErroSintaticoException("declaraï¿½ï¿½o incorreta de variï¿½veis.");
 				}
+			 }else {
+				throw new ErroSemanticoException("variável com nome duplicado."); 
+			 }
 			} else {
 				throw new ErroSintaticoException("nome de variï¿½vel nï¿½o declarado.");
 			}
@@ -233,7 +241,7 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaSubrotinas(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		/*
 		 * int flag = 0; if
 		 * (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprocedimento) ||
@@ -258,22 +266,29 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaDeclaracaoProcedimento(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		pegaToken(arquivo, listaToken);
+		NivelTabelaSimbolo nivel  = NivelTabelaSimbolo.NOVO_GALHO;
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-			pegaToken(arquivo, listaToken);
-			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
-				analisaBloco(arquivo, listaToken);
+			if (!pesquisaDuplicidadeProcedimentoTabela(tokenCorrente.getLexema())) {
+				insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.PROCEDIMENTO, NivelTabelaSimbolo.NOVO_GALHO, null);
+				pegaToken(arquivo, listaToken);
+				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
+					analisaBloco(arquivo, listaToken);
+				} else {
+					throw new ErroSintaticoException("Ponto e vï¿½rgula faltando.");
+				} 
 			} else {
-				throw new ErroSintaticoException("Ponto e vï¿½rgula faltando.");
+				throw new ErroSemanticoException("Nome de procedimento duplicado");
 			}
 		} else {
 			throw new ErroSintaticoException("indentificador de procedimento faltando.");
 		}
+		desempilhaProcedimento();
 	}
 
 	private void analisaDeclaracaoDeFuncao(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 			pegaToken(arquivo, listaToken);
@@ -377,5 +392,22 @@ public class AnalisadorSintatico {
 		if (tokenCorrente.getLexema() != null && tokenCorrente.getSimbolo() != null) {
 			listaToken.add(tokenCorrente);
 		}
+	}
+	
+	private void insereTabela(String lexema, TipoTabelaSimboloEnum tipo, 
+			NivelTabelaSimbolo nivel, Integer rotulo) {
+		analisadorSemantico.insereTabela(lexema, tipo, nivel, rotulo);
+	}
+	
+	private boolean pesquisaDuplicidadeVariaveisTabela(String lexema) {
+		return analisadorSemantico.pesquisaDuplicidadeVariaveisTabela(lexema);
+	}
+	
+	private boolean pesquisaDuplicidadeProcedimentoTabela(String lexema) {
+		return analisadorSemantico.pesquisaDuplicidadeProcedimentoTabela(lexema);
+	}
+	
+	private void desempilhaProcedimento() {
+		analisadorSemantico.desempilhaProcedimento();
 	}
 }
