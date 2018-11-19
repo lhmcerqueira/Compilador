@@ -105,5 +105,14 @@ public class AnalisadorSemantico {
 		}
 		return false;
 	}
-
+	
+	public Simbolo pesquisaTabelaSimbolos(String lexema) {
+		List<Simbolo> tabela = tabelaDeSimbolos.getTabela();
+		for (int i = tabela.size(); i > 0; i--) {
+			if ( tabela.get(i - 1).getLexema().equals(lexema)) {
+				return  tabela.get(i - 1);
+			}
+		}
+		return null;
+	}
 }

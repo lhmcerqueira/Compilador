@@ -226,7 +226,7 @@ public class AnalisadorLexico {
 				lerCaractere(arquivo);
 				return new Token(SimboloEnum.Sdif, relat.toString());
 			}else {
-				//TRATAR O ERRO NO RETORNO DO ARQUIVO
+				// TRATAR O ERRO NO RETORNO DO ARQUIVO
 				throw new CaractereNaoEsperadoEncontradoException("! sem =");
 			}
 			

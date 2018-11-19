@@ -3,6 +3,7 @@ package compilador;
 import java.util.List;
 
 import entidades.Arquivo;
+import entidades.Simbolo;
 import entidades.Token;
 import enums.NivelTabelaSimbolo;
 import enums.SimboloEnum;
@@ -147,6 +148,7 @@ public class AnalisadorSintatico {
 	private void analisaComandoSimples(Arquivo arquivo, List<Token> listaToken)
 			throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSemanticoException {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
+			//TODO verificar se o identificador existe e se ele
 			analisaAtribuicaoChamadaDeProcedimento(arquivo, listaToken);
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sse)) {
 			analisaSe(arquivo, listaToken);
@@ -162,12 +164,10 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaAtribuicaoChamadaDeProcedimento(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Satribuicao)) {
-			// analisa atribuicao, neste caso ï¿½ uma expressï¿½o e de acordo com a bnf
-			// <comando atribuicao>::= <identificador> := <expressï¿½o>
-			// jï¿½ lemos o identificador e a atribuiï¿½ao, falta apenas a expressï¿½o
+			//TODO validar se a atribuição bate com a variavel
 			pegaToken(arquivo, listaToken);
 			analisaExpressao(arquivo, listaToken);
 		} else {
@@ -334,7 +334,7 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaExpressao(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		analisaExpressaoSimples(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smaior)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smaiorig)
@@ -347,7 +347,7 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaExpressaoSimples(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smais)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenos)) {
 			pegaToken(arquivo, listaToken);
@@ -362,7 +362,7 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaTermo(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		analisaFator(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smult) || tokenCorrente.getSimbolo().equals(SimboloEnum.Sdiv)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Se)) {
@@ -373,9 +373,19 @@ public class AnalisadorSintatico {
 	}
 
 	private void analisaFator(Arquivo arquivo, List<Token> listaToken)
-			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-			analisaChamadaFuncao(arquivo, listaToken);
+			Simbolo pesquisaTabelaSimbolos = pesquisaTabelaSimbolos(tokenCorrente.getLexema());
+			if (null != pesquisaTabelaSimbolos) {
+				if (TipoTabelaSimboloEnum.FUNCAO_INTEIRO.equals(pesquisaTabelaSimbolos.getTipo()) 
+						|| TipoTabelaSimboloEnum.FUNCAO_BOOLEANO.equals(pesquisaTabelaSimbolos.getTipo())) {
+					analisaChamadaFuncao(arquivo, listaToken);
+				} else {
+					pegaToken(arquivo, listaToken);
+				}
+			}else {
+				throw new ErroSemanticoException("Identificador utilizado não declarado");
+			}
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snumero)) {
 			pegaToken(arquivo, listaToken);
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snao)) {
@@ -456,6 +466,10 @@ public class AnalisadorSintatico {
 	
 	private void desempilha() {
 		analisadorSemantico.desempilha();
+	}
+	
+	public Simbolo pesquisaTabelaSimbolos(String lexema) {
+		return analisadorSemantico.pesquisaTabelaSimbolos(lexema);
 	}
 
 }
