@@ -37,7 +37,7 @@ public class AnalisadorSintatico {
 				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 					analisaBloco(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto)) {
-						// TODO ponto de atenção ao final do arquivo.
+						// TODO ponto de atenï¿½ï¿½o ao final do arquivo.
 						pegaToken(arquivo, listaToken);
 						if (arquivo.fimDoArquivo()) {
 							return true;
@@ -104,7 +104,7 @@ public class AnalisadorSintatico {
 						throw new ErroSintaticoException("declaraï¿½ï¿½o incorreta de variï¿½veis.");
 					}
 				} else {
-					throw new ErroSemanticoException("variável com nome duplicado.");
+					throw new ErroSemanticoException("variï¿½vel com nome duplicado.");
 				}
 			} else {
 				throw new ErroSintaticoException("nome de variï¿½vel nï¿½o declarado.");
@@ -148,7 +148,9 @@ public class AnalisadorSintatico {
 	private void analisaComandoSimples(Arquivo arquivo, List<Token> listaToken)
 			throws ErroSintaticoException, FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSemanticoException {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-			//TODO verificar se o identificador existe e se ele
+			if(pesquisaTabelaSimbolos(tokenCorrente.getLexema())==null) {
+				throw new ErroSemanticoException("Identificador nÃ£o declarado utilizado.");
+			}
 			analisaAtribuicaoChamadaDeProcedimento(arquivo, listaToken);
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sse)) {
 			analisaSe(arquivo, listaToken);
@@ -167,8 +169,8 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Satribuicao)) {
-			//TODO validar se a atribuição bate com a variavel
 			pegaToken(arquivo, listaToken);
+			//TODO validar a expressÃ£o semanticamente
 			analisaExpressao(arquivo, listaToken);
 		} else {
 			analisaChamadaProcedimento(arquivo, listaToken);
@@ -189,7 +191,7 @@ public class AnalisadorSintatico {
 						throw new ErroSintaticoException(") faltando.");
 					} 
 				} else {
-					throw new ErroSemanticoException("Chamada de variável não declarada");
+					throw new ErroSemanticoException("Chamada de variï¿½vel nï¿½o declarada");
 				}
 			} else {
 				throw new ErroSintaticoException("Identificador do comando leia faltando.");
@@ -213,7 +215,7 @@ public class AnalisadorSintatico {
 						throw new ErroSintaticoException(") faltando.");
 					} 
 				}  else {
-					throw new ErroSemanticoException("Chamada de variável não declarada");
+					throw new ErroSemanticoException("Chamada de variï¿½vel nï¿½o declarada");
 				}
 			} else {
 				throw new ErroSintaticoException("Identificador do comando escreva faltando.");
@@ -325,7 +327,7 @@ public class AnalisadorSintatico {
 					throw new ErroSintaticoException(": faltando.");
 				}
 			} else {
-				throw new ErroSemanticoException("Nome de função duplicado.");
+				throw new ErroSemanticoException("Nome de funï¿½ï¿½o duplicado.");
 			}
 		} else {
 			throw new ErroSintaticoException("indentificador de funï¿½ï¿½o faltando.");
@@ -384,7 +386,7 @@ public class AnalisadorSintatico {
 					pegaToken(arquivo, listaToken);
 				}
 			}else {
-				throw new ErroSemanticoException("Identificador utilizado não declarado");
+				throw new ErroSemanticoException("Identificador utilizado nï¿½o declarado");
 			}
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snumero)) {
 			pegaToken(arquivo, listaToken);
