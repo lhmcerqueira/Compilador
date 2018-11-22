@@ -18,6 +18,7 @@ import entidades.TokenErro;
 import enums.SimboloEnum;
 import exceptions.ErroSemanticoException;
 import exceptions.ErroSintaticoException;
+import exceptions.GeradorDeCodigoException;
 import utils.GerenciadorDeArquivos;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -94,6 +95,7 @@ public class InterfaceGrafica {
 				boolean contemErroLexico = false;
 				boolean contemErroSintatico = false;
 				boolean contemErroSemantico = false;
+				boolean contemErroDeGeracao = false;
 
 				String erro = new String();
 				arquivo = new Arquivo(' ',0,text.getText().length(),0,text.getText());
@@ -104,7 +106,10 @@ public class InterfaceGrafica {
 					contemErroSintatico = true;
 					erro = e1.getMessage();
 				} catch (ErroSemanticoException e1) {
-					contemErroSemantico= true;
+					contemErroSemantico = true;
+					erro = e1.getMessage();
+				} catch (GeradorDeCodigoException e1) {
+					contemErroDeGeracao = true;
 					erro = e1.getMessage();
 				}
 				tabelaToken.removeAll();
@@ -122,21 +127,24 @@ public class InterfaceGrafica {
 					tabelaToken.getColumn(i).pack();
 				}
 				if(contemErroLexico) {
-					textResultado.setText("Erro léxico encontrado na linha "
-				+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
+					textResultado.setText("Erro lï¿½xico encontrado na linha "
+				+(arquivo.getLinhaCorrente()+1)+" no posiï¿½ï¿½o do arquivo: "
 							+arquivo.getIndiceCorrente()+", \n"+
 				 erro);
 				} else if(contemErroSintatico){
-					textResultado.setText("Erro sintático encontrado na linha "
-							+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
+					textResultado.setText("Erro sintï¿½tico encontrado na linha "
+							+(arquivo.getLinhaCorrente()+1)+" no posiï¿½ï¿½o do arquivo: "
 										+arquivo.getIndiceCorrente()+", \n"+
 							 erro);
 				} else if(contemErroSemantico){
-					textResultado.setText("Erro semântico encontrado na linha "
-							+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
+					textResultado.setText("Erro semï¿½ntico encontrado na linha "
+							+(arquivo.getLinhaCorrente()+1)+" no posiï¿½ï¿½o do arquivo: "
 										+arquivo.getIndiceCorrente()+", \n"+
 							 erro);
-				}else {
+				} else if(contemErroDeGeracao){
+					textResultado.setText("Erro de geracao ocorreu \\n"+
+							 erro);
+				} else {
 					textResultado.setText("Programa compilado com sucesso!");
 				}
 			}

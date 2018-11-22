@@ -11,6 +11,7 @@ import exceptions.CaractereNaoEsperadoEncontradoException;
 import exceptions.ErroSemanticoException;
 import exceptions.ErroSintaticoException;
 import exceptions.FimInesperadoDoArquivoException;
+import exceptions.GeradorDeCodigoException;
 
 public class Compilador {
 
@@ -25,14 +26,14 @@ public class Compilador {
 		return this.listaToken;
 	}
 
-	public void compila(Arquivo arquivo) throws ErroSintaticoException, ErroSemanticoException {
+	public void compila(Arquivo arquivo) throws ErroSintaticoException, ErroSemanticoException, GeradorDeCodigoException {
 		arquivo.lerCaractere();
 			try {
 				analisadorSintatico.analisaSintatico(arquivo, listaToken);
 			} catch (FimInesperadoDoArquivoException e) {
 				listaToken.add(new TokenErro(SimboloEnum.Serro, e.getMessage(),"Final inesperado do arquivo:"));
 			} catch (CaractereNaoEsperadoEncontradoException e) {
-				listaToken.add(new TokenErro(SimboloEnum.Serro, e.getMessage(),"Caractere não reconhecido encontrado:"));
+				listaToken.add(new TokenErro(SimboloEnum.Serro, e.getMessage(),"Caractere nï¿½o reconhecido encontrado:"));
 			} 
 		
 	}

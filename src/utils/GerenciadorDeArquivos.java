@@ -22,7 +22,7 @@ public class GerenciadorDeArquivos {
 		JFileChooser  jFileChooser = new JFileChooser();
 		StringBuilder strbldr = new StringBuilder();
 		
-		//Assim que o arquivo é escolhido o leitor começa a armazenar as linhas.
+		//Assim que o arquivo ï¿½ escolhido o leitor comeï¿½a a armazenar as linhas.
 		if(jFileChooser.showOpenDialog(null) == jFileChooser.APPROVE_OPTION) {
 			File file = jFileChooser.getSelectedFile();
 			Scanner input = new Scanner(file);
@@ -45,5 +45,11 @@ public class GerenciadorDeArquivos {
 	            fw.write(arquivo);
 	            fw.close();
 		}
+	}
+	
+	public void salvarCodigoGerado(String codigo) throws IOException {
+			   FileWriter fw = new FileWriter("/home/luizmc/codigogerado.txt");
+	            fw.write(codigo);
+	            fw.close();
 	}
 }

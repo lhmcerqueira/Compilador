@@ -13,22 +13,26 @@ import exceptions.CaractereNaoEsperadoEncontradoException;
 import exceptions.ErroSemanticoException;
 import exceptions.ErroSintaticoException;
 import exceptions.FimInesperadoDoArquivoException;
+import exceptions.GeradorDeCodigoException;
 
 public class AnalisadorSintatico {
 
 	private AnalisadorLexico analisadorLexico;
 	private AnalisadorSemantico analisadorSemantico;
+	private GeradorDeCodigo geradorDeCodigo;
 	private Token tokenCorrente;
 
 	public AnalisadorSintatico() {
 		this.analisadorLexico = new AnalisadorLexico();
 		this.analisadorSemantico = new AnalisadorSemantico();
+		this.geradorDeCodigo = new GeradorDeCodigo();
 	}
 
 	public boolean analisaSintatico(Arquivo arquivo, List<Token> listaToken) throws FimInesperadoDoArquivoException,
-			CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
+			CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException, GeradorDeCodigoException {
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprograma)) {
+			geradorDeCodigo.gera("START");
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.NOME_DE_PROGRAMA,
@@ -37,6 +41,7 @@ public class AnalisadorSintatico {
 				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 					analisaBloco(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto)) {
+						geradorDeCodigo.escreveEmArquivo();
 						// TODO ponto de aten��o ao final do arquivo.
 						pegaToken(arquivo, listaToken);
 						if (arquivo.fimDoArquivo()) {
@@ -72,6 +77,7 @@ public class AnalisadorSintatico {
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				while (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
+					geradorDeCodigo.gera("ALLOC");
 					analisaVariaveis(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 						pegaToken(arquivo, listaToken);
