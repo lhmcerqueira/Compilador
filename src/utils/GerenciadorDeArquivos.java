@@ -48,7 +48,8 @@ public class GerenciadorDeArquivos {
 	}
 	
 	public void salvarCodigoGerado(String codigo) throws IOException {
-			   FileWriter fw = new FileWriter("/home/luizmc/codigogerado.txt");
+			   //Caminho no linux
+				FileWriter fw = new FileWriter("/home/luizmc/Documents/Compilador/src/codigoGerado/codigogerado.txt");
 	            fw.write(codigo);
 	            fw.close();
 	}
