@@ -17,12 +17,12 @@ public class GeradorDeCodigo {
 	}
 
 	public void gera(String comando) {
-		codigo.append(comando).append("\n");
+		codigo.append(comando).append(System.getProperty("line.separator"));
 	}
 	
-	public void escreveEmArquivo() throws GeradorDeCodigoException {
+	public void escreveEmArquivo(String nomeDoArquivo) throws GeradorDeCodigoException {
 		try {
-			gerenciador.salvarCodigoGerado(codigo.toString());
+			gerenciador.salvarCodigoGerado(codigo.toString(),nomeDoArquivo);
 		} catch (IOException e) {
 			throw new GeradorDeCodigoException("não foi possivel gravar no arquivo");
 		}

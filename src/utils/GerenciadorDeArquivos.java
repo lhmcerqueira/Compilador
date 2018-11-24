@@ -47,10 +47,12 @@ public class GerenciadorDeArquivos {
 		}
 	}
 	
-	public void salvarCodigoGerado(String codigo) throws IOException {
+	public void salvarCodigoGerado(String codigo, String nomeDoArquivo) throws IOException {
 			   //Caminho no linux
-				FileWriter fw = new FileWriter("/home/luizmc/Documents/Compilador/src/codigoGerado/codigogerado.txt");
-	            fw.write(codigo);
+				//FileWriter fw = new FileWriter("/home/luizmc/Documents/Compilador/src/codigoGerado/"+nomeDoArquivo+".txt");
+	          //Caminho no windows
+				FileWriter fw = new FileWriter("C:\\Users\\luizh\\eclipse-photom-workspace\\Compilador\\src\\codigoGerado\\"+nomeDoArquivo+".txt");
+				fw.write(codigo);
 	            fw.close();
 	}
 }

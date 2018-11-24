@@ -21,27 +21,33 @@ public class AnalisadorSintatico {
 	private AnalisadorSemantico analisadorSemantico;
 	private GeradorDeCodigo geradorDeCodigo;
 	private Token tokenCorrente;
-
+	private int auxAlloc1;
 	public AnalisadorSintatico() {
 		this.analisadorLexico = new AnalisadorLexico();
 		this.analisadorSemantico = new AnalisadorSemantico();
 		this.geradorDeCodigo = new GeradorDeCodigo();
+		this.auxAlloc1 = 0;
 	}
 
 	public boolean analisaSintatico(Arquivo arquivo, List<Token> listaToken) throws FimInesperadoDoArquivoException,
 			CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException, GeradorDeCodigoException {
+		//armazenará o nome para gravar o arquivo gerado
+		String nomeDoArquivo;
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprograma)) {
 			geradorDeCodigo.gera("START");
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
+				nomeDoArquivo = tokenCorrente.getLexema();
+				//insere na tabela de simbolos
 				insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.NOME_DE_PROGRAMA,
 						NivelTabelaSimbolo.MARCA, null);
 				pegaToken(arquivo, listaToken);
 				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 					analisaBloco(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto)) {
-						geradorDeCodigo.escreveEmArquivo();
+						//Gera o código final
+						geradorDeCodigo.escreveEmArquivo(nomeDoArquivo);
 						// TODO ponto de atenï¿½ï¿½o ao final do arquivo.
 						pegaToken(arquivo, listaToken);
 						if (arquivo.fimDoArquivo()) {
@@ -77,7 +83,6 @@ public class AnalisadorSintatico {
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				while (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-					geradorDeCodigo.gera("ALLOC");
 					analisaVariaveis(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 						pegaToken(arquivo, listaToken);
@@ -93,10 +98,14 @@ public class AnalisadorSintatico {
 
 	private void analisaVariaveis(Arquivo arquivo, List<Token> listaToken) throws ErroSintaticoException,
 			FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSemanticoException {
+		int auxAlloc2 = 0;
 		do {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				if (!pesquisaDuplicidadeVariaveisTabela(tokenCorrente.getLexema())) {
+					//insere variável na tabela de simbolos
 					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null, null);
+					//incrementa o auxiliar para a geração de código
+					auxAlloc2++;
 					pegaToken(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Svirgula)
 							|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos)) {
@@ -116,6 +125,9 @@ public class AnalisadorSintatico {
 				throw new ErroSintaticoException("nome de variï¿½vel nï¿½o declarado.");
 			}
 		} while (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos));
+		// ponto de alloc
+		geradorDeCodigo.gera("ALLOC "+auxAlloc1+","+auxAlloc2);
+		auxAlloc1+=auxAlloc2;
 		pegaToken(arquivo, listaToken);
 		analisaTipo(arquivo, listaToken);
 	}
