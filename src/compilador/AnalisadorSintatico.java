@@ -46,6 +46,10 @@ public class AnalisadorSintatico {
 				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 					analisaBloco(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto)) {
+						int variaveis = contaVariavelParaDalloc();
+						auxAlloc1-=variaveis;
+						geradorDeCodigo.gera("DALLOC "+auxAlloc1+","+variaveis);
+						geradorDeCodigo.gera("HLT");
 						//Gera o código final
 						geradorDeCodigo.escreveEmArquivo(nomeDoArquivo);
 						// TODO ponto de atenï¿½ï¿½o ao final do arquivo.
@@ -317,7 +321,11 @@ public class AnalisadorSintatico {
 		} else {
 			throw new ErroSintaticoException("indentificador de procedimento faltando.");
 		}
-		desempilha();
+		int auxDalloc = desempilha();
+		if (auxDalloc>0) {
+			auxAlloc1 -= auxDalloc;
+			geradorDeCodigo.gera("DALLOC " + auxAlloc1 + "," + auxDalloc);
+		}
 	}
 
 	private void analisaDeclaracaoDeFuncao(Arquivo arquivo, List<Token> listaToken)
@@ -350,7 +358,11 @@ public class AnalisadorSintatico {
 		} else {
 			throw new ErroSintaticoException("indentificador de funï¿½ï¿½o faltando.");
 		}
-		desempilha();
+		int auxDalloc = desempilha();
+		if (auxDalloc>0) {
+			auxAlloc1 -= auxDalloc;
+			geradorDeCodigo.gera("DALLOC " + auxAlloc1 + "," + auxDalloc);
+		}
 	}
 
 	private void analisaExpressao(Arquivo arquivo, List<Token> listaToken)
@@ -484,8 +496,12 @@ public class AnalisadorSintatico {
 		analisadorSemantico.colocaTipoFuncao(tipo);
 	}
 	
-	private void desempilha() {
-		analisadorSemantico.desempilha();
+	private int desempilha() {
+		return analisadorSemantico.desempilha();
+	}
+	
+	private int contaVariavelParaDalloc() {
+		return analisadorSemantico.contaVariavelParaDalloc();
 	}
 	
 	public Simbolo pesquisaTabelaSimbolos(String lexema) {

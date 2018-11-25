@@ -58,19 +58,37 @@ public class AnalisadorSemantico {
 		return false;
 	}
 
-	public void desempilha() {
+	public int desempilha() {
 		List<Simbolo> tabela = tabelaDeSimbolos.getTabela();
+		int desempilhados = 0;
 		for (int i = tabela.size(); i > 0; i--) {
 			if (!NivelTabelaSimbolo.NOVO_GALHO.equals(tabela.get(i - 1).getNivel())) {
 				if (TipoTabelaSimboloEnum.VARIAVEL.equals(tabela.get(i - 1).getTipo())) {
 					tabelaDeSimbolos.getTabela().remove(i - 1);
+					desempilhados++;
 				}
 			} else {
 				break;
 			}
 		}
+		return desempilhados;
 	}
 
+	public int contaVariavelParaDalloc() {
+		List<Simbolo> tabela = tabelaDeSimbolos.getTabela();
+		int encontradas = 0;
+		for (int i = tabela.size(); i > 0; i--) {
+			if (!TipoTabelaSimboloEnum.NOME_DE_PROGRAMA.equals(tabela.get(i - 1).getTipo())) {
+				if (TipoTabelaSimboloEnum.VARIAVEL.equals(tabela.get(i - 1).getTipo())) {
+					encontradas++;
+				}
+			} else {
+				break;
+			}
+		}
+		return encontradas;
+	}
+	
 	public void colocaTipoTabela(TipoVariavelTabelaSimbolosEnum tipoVariavel) {
 		List<Simbolo> tabela = tabelaDeSimbolos.getTabela();
 		for (int i = tabela.size(); i > 0; i--) {
