@@ -14,6 +14,7 @@ import exceptions.ErroSemanticoException;
 import exceptions.ErroSintaticoException;
 import exceptions.FimInesperadoDoArquivoException;
 import exceptions.GeradorDeCodigoException;
+import utils.ConversorPosfixa;
 
 public class AnalisadorSintatico {
 
@@ -23,17 +24,20 @@ public class AnalisadorSintatico {
 	private Token tokenCorrente;
 	private int auxAlloc1;
 	private int rotulo;
+	private ConversorPosfixa conversorPisfixa;
 	public AnalisadorSintatico() {
 		this.analisadorLexico = new AnalisadorLexico();
 		this.analisadorSemantico = new AnalisadorSemantico();
 		this.geradorDeCodigo = new GeradorDeCodigo();
 		this.auxAlloc1 = 0;
 		this.rotulo = 0;
+		conversorPisfixa = new ConversorPosfixa();
+
 	}
 
 	public boolean analisaSintatico(Arquivo arquivo, List<Token> listaToken) throws FimInesperadoDoArquivoException,
 			CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException, GeradorDeCodigoException {
-		//armazenar· o nome para gravar o arquivo gerado
+		//armazenarÔøΩ o nome para gravar o arquivo gerado
 		String nomeDoArquivo;
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprograma)) {
@@ -52,7 +56,7 @@ public class AnalisadorSintatico {
 						auxAlloc1-=variaveis;
 						geradorDeCodigo.gera("DALLOC "+auxAlloc1+","+variaveis);
 						geradorDeCodigo.gera("HLT");
-						//Gera o cÛdigo final
+						//Gera o cÔøΩdigo final
 						geradorDeCodigo.escreveEmArquivo(nomeDoArquivo);
 						// TODO ponto de atenÔøΩÔøΩo ao final do arquivo.
 						pegaToken(arquivo, listaToken);
@@ -108,10 +112,10 @@ public class AnalisadorSintatico {
 		do {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				if (!pesquisaDuplicidadeVariaveisTabela(tokenCorrente.getLexema())) {
-					//insere vari·vel na tabela de simbolos
+					//insere variÔøΩvel na tabela de simbolos
 					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null, new Integer(rotulo));
 					System.out.println(tokenCorrente.getLexema()+","+rotulo);
-					//incrementa o auxiliar para a geraÁ„o de cÛdigo
+					//incrementa o auxiliar para a geraÔøΩÔøΩo de cÔøΩdigo
 					rotulo++;
 					auxAlloc2++;
 					pegaToken(arquivo, listaToken);
@@ -195,9 +199,11 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Satribuicao)) {
+			conversorPisfixa = new ConversorPosfixa();
 			pegaToken(arquivo, listaToken);
 			//TODO validar a express√£o semanticamente
 			analisaExpressao(arquivo, listaToken);
+			System.out.println(conversorPisfixa.getExpressao());
 		} else {
 			analisaChamadaProcedimento(arquivo, listaToken);
 		}
@@ -260,7 +266,10 @@ public class AnalisadorSintatico {
 	private void analisaEnquanto(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		pegaToken(arquivo, listaToken);
+		conversorPisfixa = new ConversorPosfixa();
 		analisaExpressao(arquivo, listaToken);
+		System.out.println(conversorPisfixa.getExpressao());
+
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfaca)) {
 			pegaToken(arquivo, listaToken);
 			analisaComandoSimples(arquivo, listaToken);
@@ -272,7 +281,11 @@ public class AnalisadorSintatico {
 	private void analisaSe(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		pegaToken(arquivo, listaToken);
+		conversorPisfixa = new ConversorPosfixa();
 		analisaExpressao(arquivo, listaToken);
+		//TODO validar se o retorno √© boolean
+		System.out.println(conversorPisfixa.getExpressao());
+
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sentao)) {
 			pegaToken(arquivo, listaToken);
 			analisaComandoSimples(arquivo, listaToken);
@@ -378,12 +391,15 @@ public class AnalisadorSintatico {
 
 	private void analisaExpressao(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
+
 		analisaExpressaoSimples(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smaior)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smaiorig)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenor)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenorig)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sdif)) {
+			//TODO GERA COMANDO OPERADOR L√ìGICO
+			conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 			pegaToken(arquivo, listaToken);
 			analisaExpressaoSimples(arquivo, listaToken);
 		}
@@ -393,12 +409,16 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smais)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenos)) {
+			//TODO GERA COMANDO MAIS MENOS
+			conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 			pegaToken(arquivo, listaToken);
 		}
 		analisaTermo(arquivo, listaToken);
 		while (tokenCorrente.getSimbolo().equals(SimboloEnum.Smais)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenos)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sou)) {
+			//TODO GERA COMANDO MAIS MENOS OU 
+			conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 			pegaToken(arquivo, listaToken);
 			analisaTermo(arquivo, listaToken);
 		}
@@ -409,6 +429,8 @@ public class AnalisadorSintatico {
 		analisaFator(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smult) || tokenCorrente.getSimbolo().equals(SimboloEnum.Sdiv)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Se)) {
+			//TODO GERA COMANDO MULT DIV E
+			conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 			pegaToken(arquivo, listaToken);
 			analisaFator(arquivo, listaToken);
 		}
@@ -422,28 +444,41 @@ public class AnalisadorSintatico {
 			if (null != pesquisaTabelaSimbolos) {
 				if (TipoTabelaSimboloEnum.FUNCAO_INTEIRO.equals(pesquisaTabelaSimbolos.getTipo()) 
 						|| TipoTabelaSimboloEnum.FUNCAO_BOOLEANO.equals(pesquisaTabelaSimbolos.getTipo())) {
+					//TODO GERA COMANDO PARA FUN√á√ÉO 
+					conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 					analisaChamadaFuncao(arquivo, listaToken);
 				} else {
+					//TODO GERA COMANDO PARA VARI√ÅVEL
+					conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 					pegaToken(arquivo, listaToken);
 				}
 			}else {
 				throw new ErroSemanticoException("Identificador utilizado nÔøΩo declarado");
 			}
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snumero)) {
+			//TODO GERA CARREGA CONSTANTE
+			conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 			pegaToken(arquivo, listaToken);
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snao)) {
+			//TODO GERA N√ÉO
+			conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 			pegaToken(arquivo, listaToken);
 			analisaFator(arquivo, listaToken);
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sabre_parenteses)) {
+			//TODO TRATA ABRE PARENTESES
+			conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 			pegaToken(arquivo, listaToken);
 			analisaExpressao(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfecha_parenteses)) {
+				//TODO FECHA PARENTESES
+				conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 				pegaToken(arquivo, listaToken);
 			} else {
 				throw new ErroSintaticoException("Falha ao detectar fator");
 			}
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sverdadeiro)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sfalso)) {
+			conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 			pegaToken(arquivo, listaToken);
 		}
 	}
