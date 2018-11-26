@@ -22,11 +22,13 @@ public class AnalisadorSintatico {
 	private GeradorDeCodigo geradorDeCodigo;
 	private Token tokenCorrente;
 	private int auxAlloc1;
+	private int rotulo;
 	public AnalisadorSintatico() {
 		this.analisadorLexico = new AnalisadorLexico();
 		this.analisadorSemantico = new AnalisadorSemantico();
 		this.geradorDeCodigo = new GeradorDeCodigo();
 		this.auxAlloc1 = 0;
+		this.rotulo = 0;
 	}
 
 	public boolean analisaSintatico(Arquivo arquivo, List<Token> listaToken) throws FimInesperadoDoArquivoException,
@@ -107,8 +109,10 @@ public class AnalisadorSintatico {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				if (!pesquisaDuplicidadeVariaveisTabela(tokenCorrente.getLexema())) {
 					//insere variável na tabela de simbolos
-					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null, null);
+					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null, new Integer(rotulo));
+					System.out.println(tokenCorrente.getLexema()+","+rotulo);
 					//incrementa o auxiliar para a geração de código
+					rotulo++;
 					auxAlloc2++;
 					pegaToken(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Svirgula)
@@ -205,7 +209,10 @@ public class AnalisadorSintatico {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sabre_parenteses)) {
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-				if (pesquisaDeclaracaoVariavel(tokenCorrente.getLexema())) {
+				Simbolo simbolo = pesquisaDeclaracaoVariavel(tokenCorrente.getLexema());
+				if (null!=simbolo) {
+					geradorDeCodigo.gera("RD");
+					geradorDeCodigo.gera("STR "+simbolo.getRotulo().intValue());
 					pegaToken(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfecha_parenteses)) {
 						pegaToken(arquivo, listaToken);
@@ -229,7 +236,10 @@ public class AnalisadorSintatico {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sabre_parenteses)) {
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
-				if (pesquisaDeclaracaoVariavel(tokenCorrente.getLexema())) {
+				Simbolo simbolo = pesquisaDeclaracaoVariavel(tokenCorrente.getLexema());
+				if (null!=simbolo) {
+					geradorDeCodigo.gera("LDV "+simbolo.getRotulo().intValue());
+					geradorDeCodigo.gera("PRN");
 					pegaToken(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfecha_parenteses)) {
 						pegaToken(arquivo, listaToken);
@@ -324,6 +334,7 @@ public class AnalisadorSintatico {
 		int auxDalloc = desempilha();
 		if (auxDalloc>0) {
 			auxAlloc1 -= auxDalloc;
+			rotulo = auxAlloc1;
 			geradorDeCodigo.gera("DALLOC " + auxAlloc1 + "," + auxDalloc);
 		}
 	}
@@ -474,7 +485,7 @@ public class AnalisadorSintatico {
 		analisadorSemantico.colocaTipoTabela(tipoVariavel);
 	}
     
-	private boolean pesquisaDeclaracaoVariavel(String lexema) {
+	private Simbolo pesquisaDeclaracaoVariavel(String lexema) {
 		return analisadorSemantico.pesquisaDeclaracaoVariavel(lexema);
 	}
 	
