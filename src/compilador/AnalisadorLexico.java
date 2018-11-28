@@ -1,5 +1,7 @@
 package compilador;
 
+import com.sun.xml.internal.ws.util.StringUtils;
+
 import entidades.Arquivo;
 import entidades.Token;
 import enums.SimboloEnum;
@@ -21,7 +23,7 @@ public class AnalisadorLexico {
 	public Token analiseLexical(Arquivo arquivo) throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException {
 		
 		while(!arquivo.fimDoArquivo()) {
-			while((arquivo.getCaractereCorrente()=='{'||arquivo.getCaractereCorrente()==' '|| arquivo.getCaractereCorrente()=='\n'|| arquivo.getCaractereCorrente()=='\r')&& !arquivo.fimDoArquivo()) {
+			while((arquivo.getCaractereCorrente()=='{'|| arquivo.getCaractereCorrente()==' '|| arquivo.getCaractereCorrente()=='\t'|| arquivo.getCaractereCorrente()=='\n'|| arquivo.getCaractereCorrente()=='\r')&& !arquivo.fimDoArquivo()) {
 				if(arquivo.getCaractereCorrente()=='{') {
 					while(arquivo.getCaractereCorrente()!='}' && !arquivo.fimDoArquivo()) {
 						lerCaractere(arquivo);
@@ -32,7 +34,7 @@ public class AnalisadorLexico {
 						throw new FimInesperadoDoArquivoException("falta }");
 					}
 				}
-				while(arquivo.getCaractereCorrente()==' ') {
+				while(arquivo.getCaractereCorrente()==' '|| arquivo.getCaractereCorrente()=='\t') {
 					lerCaractere(arquivo);
 				}
 				while(arquivo.getCaractereCorrente()=='\r'|| arquivo.getCaractereCorrente()=='\n') {

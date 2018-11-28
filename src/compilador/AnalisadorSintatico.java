@@ -397,7 +397,8 @@ public class AnalisadorSintatico {
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smaiorig)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenor)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenorig)
-				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sdif)) {
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sdif)
+				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sig)) {
 			//TODO GERA COMANDO OPERADOR LÓGICO
 			conversorPisfixa.constroiExpressao(tokenCorrente.getLexema());
 			pegaToken(arquivo, listaToken);
