@@ -283,18 +283,30 @@ public class AnalisadorSintatico {
 
 	private void analisaSe(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
+		int auxRot1 = rotulo;
+		int auxRot2 = 0;
 		pegaToken(arquivo, listaToken);
 		conversorPisfixa = new ConversorPosfixa();
 		analisaExpressao(arquivo, listaToken);
 		//TODO validar se o retorno é boolean
 		System.out.println(conversorPisfixa.getExpressao());
 
+		geradorDeCodigo.gera("JMPF L"+rotulo);
+		rotulo++;
+		
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sentao)) {
 			pegaToken(arquivo, listaToken);
 			analisaComandoSimples(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Ssenao)) {
+				geradorDeCodigo.gera("JMP L"+rotulo);
+				geradorDeCodigo.gera("L"+auxRot1+" NULL");
+				auxRot2 = rotulo;
+				rotulo++;
 				pegaToken(arquivo, listaToken);
 				analisaComandoSimples(arquivo, listaToken);
+				geradorDeCodigo.gera("L"+auxRot2+" NULL");
+			} else {
+				geradorDeCodigo.gera("L"+auxRot1+" NULL");
 			}
 		} else {
 			throw new ErroSintaticoException("Comando ent�o faltando.");
