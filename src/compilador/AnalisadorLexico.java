@@ -1,6 +1,5 @@
 package compilador;
 
-import com.sun.xml.internal.ws.util.StringUtils;
 
 import entidades.Arquivo;
 import entidades.Token;

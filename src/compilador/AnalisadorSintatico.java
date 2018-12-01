@@ -23,6 +23,7 @@ public class AnalisadorSintatico {
 	private GeradorDeCodigo geradorDeCodigo;
 	private Token tokenCorrente;
 	private int auxAlloc1;
+	private int alloc;
 	private int rotulo;
 	private ConversorPosfixa conversorPisfixa;
 	public AnalisadorSintatico() {
@@ -30,7 +31,8 @@ public class AnalisadorSintatico {
 		this.analisadorSemantico = new AnalisadorSemantico();
 		this.geradorDeCodigo = new GeradorDeCodigo();
 		this.auxAlloc1 = 0;
-		this.rotulo = 0;
+		this.alloc = 0;
+		this.rotulo = 1;
 		conversorPisfixa = new ConversorPosfixa();
 
 	}
@@ -69,7 +71,7 @@ public class AnalisadorSintatico {
 						throw new ErroSintaticoException("Ponto final faltando.");
 					}
 				} else {
-					throw new ErroSintaticoException("Ponto e v�rgula faltando.");
+					throw new ErroSintaticoException("Ponto e vírgula faltando.");
 				}
 			} else {
 				throw new ErroSintaticoException("Nome do programa n�o encontrado.");
@@ -97,7 +99,7 @@ public class AnalisadorSintatico {
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 						pegaToken(arquivo, listaToken);
 					} else {
-						throw new ErroSintaticoException("Ponto e v�rgula faltando.");
+						throw new ErroSintaticoException("Ponto e vírgula faltando.");
 					}
 				}
 			} else {
@@ -113,10 +115,10 @@ public class AnalisadorSintatico {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				if (!pesquisaDuplicidadeVariaveisTabela(tokenCorrente.getLexema())) {
 					//insere vari�vel na tabela de simbolos
-					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null, new Integer(rotulo));
-					System.out.println(tokenCorrente.getLexema()+","+rotulo);
+					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null, new Integer(alloc));
+					System.out.println(tokenCorrente.getLexema()+","+alloc);
 					//incrementa o auxiliar para a gera��o de c�digo
-					rotulo++;
+					alloc++;
 					auxAlloc2++;
 					pegaToken(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Svirgula)
@@ -166,7 +168,7 @@ public class AnalisadorSintatico {
 						analisaComandoSimples(arquivo, listaToken);
 					}
 				} else {
-					throw new ErroSintaticoException("Ponto e v�rgula faltando.");
+					throw new ErroSintaticoException("Ponto e vírgula faltando.");
 				}
 			}
 			pegaToken(arquivo, listaToken);
@@ -301,12 +303,16 @@ public class AnalisadorSintatico {
 
 	private void analisaSubrotinas(Arquivo arquivo, List<Token> listaToken) throws FimInesperadoDoArquivoException,
 			CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
-		/*
-		 * int flag = 0; if
-		 * (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprocedimento) ||
-		 * tokenCorrente.getSimbolo().equals(SimboloEnum.Sfuncao)) { implementa��o
-		 * do semantico }
-		 */
+	      int auxRot = 0;
+		  int flag = 0; 
+		  if(tokenCorrente.getSimbolo().equals(SimboloEnum.Sprocedimento) ||
+		  tokenCorrente.getSimbolo().equals(SimboloEnum.Sfuncao)) { 
+			  auxRot = rotulo;
+			  geradorDeCodigo.gera("JMP L"+rotulo);
+			  rotulo++;
+			  flag=1;
+		  }
+		 
 
 		while (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprocedimento)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Sfuncao)) {
@@ -318,10 +324,13 @@ public class AnalisadorSintatico {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 				pegaToken(arquivo, listaToken);
 			} else {
-				throw new ErroSintaticoException("Ponto e v�rgula faltando.");
+				throw new ErroSintaticoException("Ponto e vírgula faltando.");
 			}
 		}
-
+		
+		if(flag == 1) {
+			  geradorDeCodigo.gera("L"+auxRot+" NULL");
+		}
 	}
 
 	private void analisaDeclaracaoProcedimento(Arquivo arquivo, List<Token> listaToken)
@@ -336,7 +345,7 @@ public class AnalisadorSintatico {
 				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 					analisaBloco(arquivo, listaToken);
 				} else {
-					throw new ErroSintaticoException("Ponto e v�rgula faltando.");
+					throw new ErroSintaticoException("Ponto e vírgula faltando.");
 				}
 			} else {
 				throw new ErroSemanticoException("Nome de procedimento duplicado");
@@ -347,7 +356,7 @@ public class AnalisadorSintatico {
 		int auxDalloc = desempilha();
 		if (auxDalloc>0) {
 			auxAlloc1 -= auxDalloc;
-			rotulo = auxAlloc1;
+			alloc = auxAlloc1;
 			geradorDeCodigo.gera("DALLOC " + auxAlloc1 + "," + auxDalloc);
 		}
 	}
