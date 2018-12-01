@@ -1,23 +1,32 @@
 package utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /* Java implementation to convert infix expression to postfix*/
 //Note that here we use Stack class for Stack operations 
 
-import java.util.Stack; 
+import java.util.Stack;
+
+import entidades.ElementoPosfixa; 
 
 public class ConversorPosfixa 
 { 
-	private StringBuffer expressao;
+	private List<ElementoPosfixa> elementos;
 	
 	public ConversorPosfixa() {
-		this.expressao = new StringBuffer();
+		this.elementos = new ArrayList<>();
 	}
 	
-	public void constroiExpressao(String fator) {
-		this.expressao.append(fator);
+	public void constroiExpressao(ElementoPosfixa elemento) {
+		this.elementos.add(elemento);
 	}
 	public String getExpressao() {
-		return this.expressao.toString();
+		String expressao = new String();
+		for (ElementoPosfixa elementoPosfixa : elementos) {
+			expressao = expressao +" "+elementoPosfixa.getToken().getLexema();
+		}
+		return expressao;
 	}
 	// A utility function to return precedence of a given operator 
 	// Higher returned value means higher precedence 
@@ -90,9 +99,9 @@ public class ConversorPosfixa
 	} 
 	
 	// Driver method 
-	public String teste() 
+/*	public String teste() 
 	{ 
 		//String exp = "a+b*(c^d-e)^(f+g*h)-i"; 
 		return infixToPostfix(this.expressao.toString()); 
-	} 
+	} */
 } 
