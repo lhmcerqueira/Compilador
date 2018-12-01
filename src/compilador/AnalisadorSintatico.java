@@ -199,6 +199,7 @@ public class AnalisadorSintatico {
 
 	private void analisaAtribuicaoChamadaDeProcedimento(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
+		Token tokenAux = tokenCorrente;
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Satribuicao)) {
 			conversorPisfixa = new ConversorPosfixa();
@@ -207,7 +208,7 @@ public class AnalisadorSintatico {
 			analisaExpressao(arquivo, listaToken);
 			System.out.println(conversorPisfixa.getExpressao());
 		} else {
-			analisaChamadaProcedimento(arquivo, listaToken);
+			analisaChamadaProcedimento(arquivo, listaToken,tokenAux);
 		}
 	}
 
@@ -340,7 +341,9 @@ public class AnalisadorSintatico {
 		NivelTabelaSimbolo nivel = NivelTabelaSimbolo.NOVO_GALHO;
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 			if (!pesquisaDuplicidadeProcedimentoTabela(tokenCorrente.getLexema())) {
-				insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.PROCEDIMENTO, nivel, null);
+				insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.PROCEDIMENTO, nivel, new Integer(rotulo));
+				geradorDeCodigo.gera("L"+rotulo+" NULL");
+				rotulo++;
 				pegaToken(arquivo, listaToken);
 				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto_virgula)) {
 					analisaBloco(arquivo, listaToken);
@@ -368,7 +371,9 @@ public class AnalisadorSintatico {
 		NivelTabelaSimbolo nivel = NivelTabelaSimbolo.NOVO_GALHO;
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 			if (!pesquisaDuplicidadeFuncaoTabela(tokenCorrente.getLexema())) {
-				insereTabela(tokenCorrente.getLexema(), null, nivel, null);
+				insereTabela(tokenCorrente.getLexema(), null, nivel, new Integer(rotulo));
+				geradorDeCodigo.gera("L"+rotulo+" NULL");
+				rotulo++;
 				pegaToken(arquivo, listaToken);
 				if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos)) {
 					pegaToken(arquivo, listaToken);
@@ -493,13 +498,20 @@ public class AnalisadorSintatico {
 		}
 	}
 
-	public void analisaChamadaProcedimento(Arquivo arquivo, List<Token> listaToken)
+	public void analisaChamadaProcedimento(Arquivo arquivo, List<Token> listaToken, Token tokenAux)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
-
+		Simbolo procedimentoTabela = getProcedimentoTabela(tokenAux.getLexema());
+		if (null!=procedimentoTabela) {
+			geradorDeCodigo.gera("CALL L" + procedimentoTabela.getRotulo().intValue());
+		}
 	}
 
 	public void analisaChamadaFuncao(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
+		Simbolo funcaoTabela = getFuncaoTabela(tokenCorrente.getLexema());
+		if(null!=funcaoTabela) {
+			geradorDeCodigo.gera("CALL L" + funcaoTabela.getRotulo().intValue());
+		}
 		pegaToken(arquivo, listaToken);
 
 	}
@@ -537,9 +549,17 @@ public class AnalisadorSintatico {
 	private boolean pesquisaDuplicidadeProcedimentoTabela(String lexema) {
 		return analisadorSemantico.pesquisaDuplicidadeProcedimentoTabela(lexema);
 	}
-
+	
+	private Simbolo getProcedimentoTabela(String lexema) {
+		return analisadorSemantico.getProcedimentoTabela(lexema);
+	}
+	
 	private boolean pesquisaDuplicidadeFuncaoTabela(String lexema) {
 		return analisadorSemantico.pesquisaDuplicidadeFuncaoTabela(lexema);
+	}
+	
+	private Simbolo getFuncaoTabela(String lexema) {
+		return analisadorSemantico.getFuncaoTabela(lexema);
 	}
 	
 	private void colocaTipoFuncao(SimboloEnum simbolo) {

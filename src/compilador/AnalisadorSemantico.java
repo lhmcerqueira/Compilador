@@ -46,6 +46,17 @@ public class AnalisadorSemantico {
 		return false;
 	}
 
+	public Simbolo getProcedimentoTabela(String lexema) {
+		List<Simbolo> tabela = tabelaDeSimbolos.getTabela();
+		for (int i = tabela.size(); i > 0; i--) {
+			if (TipoTabelaSimboloEnum.PROCEDIMENTO.equals(tabela.get(i - 1).getTipo())
+					&& tabela.get(i - 1).getLexema().equals(lexema)) {
+				return tabela.get(i - 1);
+			}
+		}
+		return null;
+	}
+	
 	public boolean pesquisaDuplicidadeFuncaoTabela(String lexema) {
 		List<Simbolo> tabela = tabelaDeSimbolos.getTabela();
 		for (int i = tabela.size(); i > 0; i--) {
@@ -58,6 +69,19 @@ public class AnalisadorSemantico {
 		return false;
 	}
 
+	public Simbolo getFuncaoTabela(String lexema) {
+		List<Simbolo> tabela = tabelaDeSimbolos.getTabela();
+		for (int i = tabela.size(); i > 0; i--) {
+			if ((TipoTabelaSimboloEnum.FUNCAO_INTEIRO.equals(tabela.get(i - 1).getTipo())
+					|| TipoTabelaSimboloEnum.FUNCAO_BOOLEANO.equals(tabela.get(i - 1).getTipo()))
+					&& tabela.get(i - 1).getLexema().equals(lexema)) {
+				return tabela.get(i - 1);
+			}
+		}
+		return null;
+	}
+
+	
 	public int desempilha() {
 		List<Simbolo> tabela = tabelaDeSimbolos.getTabela();
 		int desempilhados = 0;
