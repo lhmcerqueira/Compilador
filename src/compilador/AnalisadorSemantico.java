@@ -82,17 +82,21 @@ public class AnalisadorSemantico {
 	}
 
 	
-	public int desempilha() {
+	public int desempilha(String nomeFuncao) {
 		List<Simbolo> tabela = tabelaDeSimbolos.getTabela();
 		int desempilhados = 0;
 		for (int i = tabela.size(); i > 0; i--) {
-			if (!NivelTabelaSimbolo.NOVO_GALHO.equals(tabela.get(i - 1).getNivel())) {
+			if (!tabela.get(i - 1).getLexema().equals(nomeFuncao)) {
 				if (TipoTabelaSimboloEnum.VARIAVEL.equals(tabela.get(i - 1).getTipo())) {
 					tabelaDeSimbolos.getTabela().remove(i - 1);
 					desempilhados++;
 				}
 			} else {
-				break;
+				if(tabela.get(i - 1).getTipo().equals(TipoTabelaSimboloEnum.FUNCAO_BOOLEANO)
+						||tabela.get(i - 1).getTipo().equals(TipoTabelaSimboloEnum.FUNCAO_INTEIRO)
+						||tabela.get(i - 1).getTipo().equals(TipoTabelaSimboloEnum.PROCEDIMENTO)) {
+					break;
+				}
 			}
 		}
 		return desempilhados;

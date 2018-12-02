@@ -31,8 +31,8 @@ public class AnalisadorSintatico {
 		this.analisadorLexico = new AnalisadorLexico();
 		this.analisadorSemantico = new AnalisadorSemantico();
 		this.geradorDeCodigo = new GeradorDeCodigo();
-		this.auxAlloc1 = 0;
-		this.alloc = 0;
+		this.auxAlloc1 = 1;
+		this.alloc = 1;
 		this.rotulo = 1;
 		conversorPisfixa = new ConversorPosfixa();
 
@@ -117,7 +117,7 @@ public class AnalisadorSintatico {
 				if (!pesquisaDuplicidadeVariaveisTabela(tokenCorrente.getLexema())) {
 					//insere vari�vel na tabela de simbolos
 					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null, new Integer(alloc));
-					//System.out.println(tokenCorrente.getLexema()+","+alloc);
+					System.out.println(tokenCorrente.getLexema()+","+alloc);
 					//incrementa o auxiliar para a gera��o de c�digo
 					alloc++;
 					auxAlloc2++;
@@ -366,10 +366,12 @@ public class AnalisadorSintatico {
 	private void analisaDeclaracaoProcedimento(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException,
 			ErroSemanticoException {
+		Token tokenAux = new Token();
 		pegaToken(arquivo, listaToken);
 		NivelTabelaSimbolo nivel = NivelTabelaSimbolo.NOVO_GALHO;
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 			if (!pesquisaDuplicidadeProcedimentoTabela(tokenCorrente.getLexema())) {
+				tokenAux = tokenCorrente;
 				insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.PROCEDIMENTO, nivel, new Integer(rotulo));
 				geradorDeCodigo.gera("L"+rotulo+" NULL");
 				rotulo++;
@@ -385,7 +387,7 @@ public class AnalisadorSintatico {
 		} else {
 			throw new ErroSintaticoException("indentificador de procedimento faltando.");
 		}
-		int auxDalloc = desempilha();
+		int auxDalloc = desempilha(tokenAux.getLexema());
 		if (auxDalloc>0) {
 			auxAlloc1 -= auxDalloc;
 			alloc = auxAlloc1;
@@ -397,10 +399,12 @@ public class AnalisadorSintatico {
 	private void analisaDeclaracaoDeFuncao(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException,
 			ErroSemanticoException {
+		Token tokenAux = new Token();
 		pegaToken(arquivo, listaToken);
 		NivelTabelaSimbolo nivel = NivelTabelaSimbolo.NOVO_GALHO;
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 			if (!pesquisaDuplicidadeFuncaoTabela(tokenCorrente.getLexema())) {
+				tokenAux = tokenCorrente;
 				insereTabela(tokenCorrente.getLexema(), null, nivel, new Integer(rotulo));
 				geradorDeCodigo.gera("L"+rotulo+" NULL");
 				rotulo++;
@@ -426,7 +430,8 @@ public class AnalisadorSintatico {
 		} else {
 			throw new ErroSintaticoException("indentificador de fun��o faltando.");
 		}
-		int auxDalloc = desempilha();
+		System.out.println("FUNÇÃO CORRENTE"+tokenAux.getLexema());
+		int auxDalloc = desempilha(tokenAux.getLexema());
 		if (auxDalloc>0) {
 			auxAlloc1 -= auxDalloc;
 			geradorDeCodigo.gera(" DALLOC " + auxAlloc1 + "," + auxDalloc);
@@ -624,8 +629,8 @@ public class AnalisadorSintatico {
 		analisadorSemantico.colocaTipoFuncao(tipo);
 	}
 	
-	private int desempilha() {
-		return analisadorSemantico.desempilha();
+	private int desempilha(String nomeFuncao) {
+		return analisadorSemantico.desempilha(nomeFuncao);
 	}
 	
 	private int contaVariavelParaDalloc() {
