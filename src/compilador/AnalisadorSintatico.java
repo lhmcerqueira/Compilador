@@ -44,7 +44,7 @@ public class AnalisadorSintatico {
 		String nomeDoArquivo;
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sprograma)) {
-			geradorDeCodigo.gera("START");
+			geradorDeCodigo.gera(" START");
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				nomeDoArquivo = tokenCorrente.getLexema();
@@ -57,8 +57,8 @@ public class AnalisadorSintatico {
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sponto)) {
 						int variaveis = contaVariavelParaDalloc();
 						auxAlloc1-=variaveis;
-						geradorDeCodigo.gera("DALLOC "+auxAlloc1+","+variaveis);
-						geradorDeCodigo.gera("HLT");
+						geradorDeCodigo.gera(" DALLOC "+auxAlloc1+","+variaveis);
+						geradorDeCodigo.gera(" HLT");
 						//Gera o c�digo final
 						geradorDeCodigo.escreveEmArquivo(nomeDoArquivo);
 						// TODO ponto de aten��o ao final do arquivo.
@@ -117,7 +117,7 @@ public class AnalisadorSintatico {
 				if (!pesquisaDuplicidadeVariaveisTabela(tokenCorrente.getLexema())) {
 					//insere vari�vel na tabela de simbolos
 					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null, new Integer(alloc));
-					System.out.println(tokenCorrente.getLexema()+","+alloc);
+					//System.out.println(tokenCorrente.getLexema()+","+alloc);
 					//incrementa o auxiliar para a gera��o de c�digo
 					alloc++;
 					auxAlloc2++;
@@ -141,7 +141,7 @@ public class AnalisadorSintatico {
 			}
 		} while (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos));
 		// ponto de alloc
-		geradorDeCodigo.gera("ALLOC "+auxAlloc1+","+auxAlloc2);
+		geradorDeCodigo.gera(" ALLOC "+auxAlloc1+","+auxAlloc2);
 		auxAlloc1+=auxAlloc2;
 		pegaToken(arquivo, listaToken);
 		analisaTipo(arquivo, listaToken);
@@ -202,7 +202,7 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		Token tokenAux = tokenCorrente;
 		conversorPisfixa = new ConversorPosfixa();
-		conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenCorrente, TipoTabelaSimboloEnum.PROCEDIMENTO, 0));
+		conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenCorrente,null, 0));
 		pegaToken(arquivo, listaToken);
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Satribuicao)) {
 			conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenCorrente, null, 1));
@@ -212,6 +212,7 @@ public class AnalisadorSintatico {
 			
 			analisaExpressao(arquivo, listaToken);
 			System.out.println(conversorPisfixa.getExpressao());
+			geradorDeCodigo.geraPosfixa(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
 		} else {
 			analisaChamadaProcedimento(arquivo, listaToken,tokenAux);
 		}
@@ -225,8 +226,8 @@ public class AnalisadorSintatico {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				Simbolo simbolo = pesquisaDeclaracaoVariavel(tokenCorrente.getLexema());
 				if (null!=simbolo) {
-					geradorDeCodigo.gera("RD");
-					geradorDeCodigo.gera("STR "+simbolo.getRotulo().intValue());
+					geradorDeCodigo.gera(" RD");
+					geradorDeCodigo.gera(" STR "+simbolo.getRotulo().intValue());
 					pegaToken(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfecha_parenteses)) {
 						pegaToken(arquivo, listaToken);
@@ -252,8 +253,8 @@ public class AnalisadorSintatico {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				Simbolo simbolo = pesquisaDeclaracaoVariavel(tokenCorrente.getLexema());
 				if (null!=simbolo) {
-					geradorDeCodigo.gera("LDV "+simbolo.getRotulo().intValue());
-					geradorDeCodigo.gera("PRN");
+					geradorDeCodigo.gera(" LDV "+simbolo.getRotulo().intValue());
+					geradorDeCodigo.gera(" PRN");
 					pegaToken(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfecha_parenteses)) {
 						pegaToken(arquivo, listaToken);
@@ -281,14 +282,15 @@ public class AnalisadorSintatico {
 		conversorPisfixa = new ConversorPosfixa();
 		analisaExpressao(arquivo, listaToken);
 		System.out.println(conversorPisfixa.getExpressao());
+		geradorDeCodigo.geraPosfixa(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
 
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfaca)) {
 			auxRot2 = rotulo;
-			geradorDeCodigo.gera("JMPF L"+rotulo);
+			geradorDeCodigo.gera(" JMPF L"+rotulo);
 			rotulo++;
 			pegaToken(arquivo, listaToken);
 			analisaComandoSimples(arquivo, listaToken);
-			geradorDeCodigo.gera("JMP L"+auxRot1);
+			geradorDeCodigo.gera(" JMP L"+auxRot1);
 			geradorDeCodigo.gera("L"+auxRot2+" NULL");
 		} else {
 			throw new ErroSintaticoException("Comando fa�a faltando.");
@@ -304,15 +306,16 @@ public class AnalisadorSintatico {
 		analisaExpressao(arquivo, listaToken);
 		//TODO validar se o retorno é boolean
 		System.out.println(conversorPisfixa.getExpressao());
+		geradorDeCodigo.geraPosfixa(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
 
-		geradorDeCodigo.gera("JMPF L"+rotulo);
+		geradorDeCodigo.gera(" JMPF L"+rotulo);
 		rotulo++;
 		
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sentao)) {
 			pegaToken(arquivo, listaToken);
 			analisaComandoSimples(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Ssenao)) {
-				geradorDeCodigo.gera("JMP L"+rotulo);
+				geradorDeCodigo.gera(" JMP L"+rotulo);
 				geradorDeCodigo.gera("L"+auxRot1+" NULL");
 				auxRot2 = rotulo;
 				rotulo++;
@@ -335,7 +338,7 @@ public class AnalisadorSintatico {
 		  if(tokenCorrente.getSimbolo().equals(SimboloEnum.Sprocedimento) ||
 		  tokenCorrente.getSimbolo().equals(SimboloEnum.Sfuncao)) { 
 			  auxRot = rotulo;
-			  geradorDeCodigo.gera("JMP L"+rotulo);
+			  geradorDeCodigo.gera(" JMP L"+rotulo);
 			  rotulo++;
 			  flag=1;
 		  }
@@ -386,8 +389,9 @@ public class AnalisadorSintatico {
 		if (auxDalloc>0) {
 			auxAlloc1 -= auxDalloc;
 			alloc = auxAlloc1;
-			geradorDeCodigo.gera("DALLOC " + auxAlloc1 + "," + auxDalloc);
+			geradorDeCodigo.gera(" DALLOC " + auxAlloc1 + "," + auxDalloc);
 		}
+		geradorDeCodigo.gera(" RETURN");
 	}
 
 	private void analisaDeclaracaoDeFuncao(Arquivo arquivo, List<Token> listaToken)
@@ -425,8 +429,9 @@ public class AnalisadorSintatico {
 		int auxDalloc = desempilha();
 		if (auxDalloc>0) {
 			auxAlloc1 -= auxDalloc;
-			geradorDeCodigo.gera("DALLOC " + auxAlloc1 + "," + auxDalloc);
+			geradorDeCodigo.gera(" DALLOC " + auxAlloc1 + "," + auxDalloc);
 		}
+		geradorDeCodigo.gera(" RETURNF");
 	}
 
 	private void analisaExpressao(Arquivo arquivo, List<Token> listaToken)
@@ -451,8 +456,15 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException, ErroSemanticoException {
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smais)
 				|| tokenCorrente.getSimbolo().equals(SimboloEnum.Smenos)) {
+			Token tokenAux = new Token();
+			tokenAux.setLexema(tokenCorrente.getLexema());
+			if(tokenCorrente.getSimbolo().equals(SimboloEnum.Smais)) {
+				tokenAux.setSimbolo(SimboloEnum.Smais_sinal);
+			} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Smenos)) {
+				tokenAux.setSimbolo(SimboloEnum.Smenos_sinal);
+			}
 			//TODO GERA COMANDO MAIS MENOS
-			conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenCorrente, null, 7));
+			conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenAux, null, 7));
 			pegaToken(arquivo, listaToken);
 		}
 		analisaTermo(arquivo, listaToken);
@@ -503,7 +515,7 @@ public class AnalisadorSintatico {
 				if (TipoTabelaSimboloEnum.FUNCAO_INTEIRO.equals(pesquisaTabelaSimbolos.getTipo()) 
 						|| TipoTabelaSimboloEnum.FUNCAO_BOOLEANO.equals(pesquisaTabelaSimbolos.getTipo())) {
 					//TODO GERA COMANDO PARA FUNÇÃO 
-					conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenCorrente, null, 0));
+					conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenCorrente, TipoTabelaSimboloEnum.FUNCAO, 0));
 					analisaChamadaFuncao(arquivo, listaToken);
 				} else {
 					//TODO GERA COMANDO PARA VARIÁVEL
@@ -551,10 +563,7 @@ public class AnalisadorSintatico {
 
 	public void analisaChamadaFuncao(Arquivo arquivo, List<Token> listaToken)
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
-		Simbolo funcaoTabela = getFuncaoTabela(tokenCorrente.getLexema());
-		if(null!=funcaoTabela) {
-			geradorDeCodigo.gera("CALL L" + funcaoTabela.getRotulo().intValue());
-		}
+
 		pegaToken(arquivo, listaToken);
 
 	}

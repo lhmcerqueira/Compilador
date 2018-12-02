@@ -8,16 +8,26 @@ import java.util.List;
 
 import java.util.Stack;
 
-import entidades.ElementoPosfixa; 
+import entidades.ElementoPosfixa;
+import enums.SimboloEnum; 
 
 public class ConversorPosfixa 
 { 
 	private List<ElementoPosfixa> elementos;
-	
+	private List<ElementoPosfixa> ordenacaoPosfixa;
+	private List<ElementoPosfixa> ordenacaoAux;
+
+
 	public ConversorPosfixa() {
 		this.elementos = new ArrayList<>();
+		this.ordenacaoPosfixa = new ArrayList<>();
+		this.ordenacaoAux = new ArrayList<>();
 	}
 	
+	public List<ElementoPosfixa> getOrdenacaoPosfixa() {
+		return ordenacaoPosfixa;
+	}
+
 	public void constroiExpressao(ElementoPosfixa elemento) {
 		this.elementos.add(elemento);
 	}
@@ -26,82 +36,64 @@ public class ConversorPosfixa
 		for (ElementoPosfixa elementoPosfixa : elementos) {
 			expressao = expressao +" "+elementoPosfixa.getToken().getLexema();
 		}
+		expressao +="\n";
+		ordernacaoPosfixa();
+		for (ElementoPosfixa elementoPosfixa : ordenacaoPosfixa) {
+			expressao = expressao +" "+elementoPosfixa.getToken().getLexema();
+		}
 		return expressao;
 	}
-	// A utility function to return precedence of a given operator 
-	// Higher returned value means higher precedence 
-	static int Prec(char ch) 
-	{ 
-		switch (ch) 
-		{ 
-		case '+': 
-		case '-': 
-			return 1; 
 	
-		case '*': 
-		case '/': 
-			return 2; 
-	
-		case '^': 
-			return 3; 
-		} 
-		return -1; 
-	} 
-	
-	// The main method that converts given infix expression 
-	// to postfix expression. 
-	static String infixToPostfix(String exp) 
-	{ 
-		// initializing empty String for result 
-		String result = new String(""); 
+	public void ordernacaoPosfixa(){
+		this.ordenacaoPosfixa = new ArrayList<>();
+
+		while(elementos.size()>0) {
 		
-		// initializing empty stack 
-		Stack<Character> stack = new Stack<>(); 
+			if(elementos.get(0).getToken().getSimbolo().equals(SimboloEnum.Sidentificador)
+					||elementos.get(0).getToken().getSimbolo().equals(SimboloEnum.Snumero)
+					||elementos.get(0).getToken().getSimbolo().equals(SimboloEnum.Sverdadeiro)
+					||elementos.get(0).getToken().getSimbolo().equals(SimboloEnum.Sfalso)) {
+				ordenacaoPosfixa.add(elementos.get(0));
+				elementos.remove(0);
+				if(elementos.size()==0) {
+					break;
+				}
+			}
+			if(ordenacaoAux.size()==0) {
+				ordenacaoAux.add(elementos.get(0));
+				elementos.remove(0);
+			} else if(ordenacaoAux.get(ordenacaoAux.size()-1).getPrioridade() < elementos.get(0).getPrioridade()
+					|| elementos.get(0).getPrioridade()==-1) {
+				ordenacaoAux.add(elementos.get(0));
+				elementos.remove(0);
+			} else if (ordenacaoAux.get(ordenacaoAux.size()-1).getPrioridade() >= elementos.get(0).getPrioridade()) {
+				while(ordenacaoAux.get(ordenacaoAux.size()-1).getPrioridade() > elementos.get(0).getPrioridade()) {
+					if(ordenacaoAux.get(ordenacaoAux.size()-1).getPrioridade() > -1) {
+						ordenacaoPosfixa.add(ordenacaoAux.get(ordenacaoAux.size()-1));
+					} else {
+						//ponto de atenção
+						elementos.remove(0);
+					}
+					ordenacaoAux.remove(ordenacaoAux.size()-1);
+					if(elementos.size()==0
+							||ordenacaoAux.size()==0) {
+						break;
+					}
 		
-		for (int i = 0; i<exp.length(); ++i) 
-		{ 
-			char c = exp.charAt(i); 
+				}
+				if(elementos.size()>0) {
+					ordenacaoAux.add(elementos.get(0));
+					elementos.remove(0);
+				}
+			}
 			
-			// If the scanned character is an operand, add it to output. 
-			if (Character.isLetterOrDigit(c)) 
-				result += c; 
-			
-			// If the scanned character is an '(', push it to the stack. 
-			else if (c == '(') 
-				stack.push(c); 
-			
-			// If the scanned character is an ')', pop and output from the stack 
-			// until an '(' is encountered. 
-			else if (c == ')') 
-			{ 
-				while (!stack.isEmpty() && stack.peek() != '(') 
-					result += stack.pop(); 
-				
-				if (!stack.isEmpty() && stack.peek() != '(') 
-					return "Invalid Expression"; // invalid expression				 
-				else
-					stack.pop(); 
-			} 
-			else // an operator is encountered 
-			{ 
-				while (!stack.isEmpty() && Prec(c) <= Prec(stack.peek())) 
-					result += stack.pop(); 
-				stack.push(c); 
-			} 
+		}
+		
+		while(ordenacaoAux.size()>0) {
+			ordenacaoPosfixa.add(ordenacaoAux.get(ordenacaoAux.size()-1));
+			ordenacaoAux.remove(ordenacaoAux.size()-1);
+		}
+		//return this.ordenacaoPosfixa;
+	}
 	
-		} 
-	
-		// pop all the operators from the stack 
-		while (!stack.isEmpty()) 
-			result += stack.pop(); 
-	
-		return result; 
-	} 
-	
-	// Driver method 
-/*	public String teste() 
-	{ 
-		//String exp = "a+b*(c^d-e)^(f+g*h)-i"; 
-		return infixToPostfix(this.expressao.toString()); 
-	} */
 } 
