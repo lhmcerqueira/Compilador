@@ -61,8 +61,12 @@ public class AnalisadorSintatico {
 						geradorDeCodigo.gera(" HLT");
 						//Gera o c�digo final
 						geradorDeCodigo.escreveEmArquivo(nomeDoArquivo);
-						// TODO ponto de aten��o ao final do arquivo.
-						pegaToken(arquivo, listaToken);
+					//	try {
+							// TODO ponto de aten��o ao final do arquivo.
+							pegaToken(arquivo, listaToken);
+						//} catch (Exception e) {
+						//	return true;
+					//	}
 						if (arquivo.fimDoArquivo()) {
 							return true;
 						} else {
@@ -212,7 +216,7 @@ public class AnalisadorSintatico {
 			
 			analisaExpressao(arquivo, listaToken);
 			System.out.println(conversorPisfixa.getExpressao());
-			geradorDeCodigo.geraPosfixa(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
+			geradorDeCodigo.geraPosfixaAtribuicao(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
 		} else {
 			analisaChamadaProcedimento(arquivo, listaToken,tokenAux);
 		}
@@ -282,7 +286,7 @@ public class AnalisadorSintatico {
 		conversorPisfixa = new ConversorPosfixa();
 		analisaExpressao(arquivo, listaToken);
 		System.out.println(conversorPisfixa.getExpressao());
-		geradorDeCodigo.geraPosfixa(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
+		geradorDeCodigo.geraPosfixaBooleano(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
 
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfaca)) {
 			auxRot2 = rotulo;
@@ -293,7 +297,7 @@ public class AnalisadorSintatico {
 			geradorDeCodigo.gera(" JMP L"+auxRot1);
 			geradorDeCodigo.gera("L"+auxRot2+" NULL");
 		} else {
-			throw new ErroSintaticoException("Comando fa�a faltando.");
+			throw new ErroSintaticoException("Comando faça faltando.");
 		}
 	}
 
@@ -304,9 +308,10 @@ public class AnalisadorSintatico {
 		pegaToken(arquivo, listaToken);
 		conversorPisfixa = new ConversorPosfixa();
 		analisaExpressao(arquivo, listaToken);
-		//TODO validar se o retorno é boolean
 		System.out.println(conversorPisfixa.getExpressao());
-		geradorDeCodigo.geraPosfixa(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
+		geradorDeCodigo.geraPosfixaBooleano(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
+
+		//TODO validar se o retorno é boolean
 
 		geradorDeCodigo.gera(" JMPF L"+rotulo);
 		rotulo++;
@@ -501,7 +506,10 @@ public class AnalisadorSintatico {
 			if(tokenCorrente.getSimbolo().equals(SimboloEnum.Smult)) {
 				conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenCorrente, null, 6));
 
-			} else if(tokenCorrente.getSimbolo().equals(SimboloEnum.Se)) {
+			} if(tokenCorrente.getSimbolo().equals(SimboloEnum.Sdiv)) {
+				conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenCorrente, null, 6));
+
+			}else if(tokenCorrente.getSimbolo().equals(SimboloEnum.Se)) {
 				conversorPisfixa.constroiExpressao(new ElementoPosfixa(tokenCorrente, null, 2));
 
 			}
@@ -562,7 +570,7 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		Simbolo procedimentoTabela = getProcedimentoTabela(tokenAux.getLexema());
 		if (null!=procedimentoTabela) {
-			geradorDeCodigo.gera("CALL L" + procedimentoTabela.getRotulo().intValue());
+			geradorDeCodigo.gera(" CALL L" + procedimentoTabela.getRotulo().intValue());
 		}
 	}
 
