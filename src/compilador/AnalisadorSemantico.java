@@ -1,11 +1,14 @@
 package compilador;
 
 import entidades.TabelaDeSimbolos;
+import entidades.Token;
 
 import java.util.List;
 
+import entidades.ElementoPosfixa;
 import entidades.Simbolo;
 import enums.NivelTabelaSimbolo;
+import enums.SimboloEnum;
 import enums.TipoTabelaSimboloEnum;
 import enums.TipoVariavelTabelaSimbolosEnum;
 
@@ -160,5 +163,20 @@ public class AnalisadorSemantico {
 			}
 		}
 		return null;
+	}
+	
+	public boolean analisaExpressaoBooleana(List<ElementoPosfixa> expressaoposfixa) {
+		for (ElementoPosfixa elementoPosfixa : expressaoposfixa) {
+			
+			Token token = elementoPosfixa.getToken();
+			if(token.getSimbolo().equals(SimboloEnum.Smaior)
+					||token.getSimbolo().equals(SimboloEnum.Smaiorig)
+					||token.getSimbolo().equals(SimboloEnum.Smenorig)
+					||token.getSimbolo().equals(SimboloEnum.Sdif)
+					||token.getSimbolo().equals(SimboloEnum.Sig)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

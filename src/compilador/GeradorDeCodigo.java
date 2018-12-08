@@ -31,7 +31,6 @@ public class GeradorDeCodigo {
 				Simbolo simbolo = analisadorSemantico.getFuncaoTabela(ordenacaoPosfixa.get(i).getToken().getLexema());
 				if(null!=simbolo) {
 					gera(" CALL L"+simbolo.getRotulo().intValue());
-					gera(" LDV 0");
 				} else {
 					simbolo = analisadorSemantico.pesquisaDeclaracaoVariavel(ordenacaoPosfixa.get(i).getToken().getLexema());
 					gera(" LDV "+simbolo.getRotulo().intValue());
@@ -76,7 +75,7 @@ public class GeradorDeCodigo {
 			else if(ordenacaoPosfixa.get(i).getToken().getSimbolo().equals(SimboloEnum.Satribuicao)) {
 				Simbolo simbolo = analisadorSemantico.getFuncaoTabela(ordenacaoPosfixa.get(0).getToken().getLexema());
 				if(null!=simbolo) {
-					gera(" STR 0");
+					
 				} else {
 					simbolo = analisadorSemantico.pesquisaDeclaracaoVariavel(ordenacaoPosfixa.get(0).getToken().getLexema());
 					gera(" STR "+simbolo.getRotulo().intValue());
@@ -91,7 +90,7 @@ public class GeradorDeCodigo {
 				Simbolo simbolo = analisadorSemantico.getFuncaoTabela(ordenacaoPosfixa.get(i).getToken().getLexema());
 				if(null!=simbolo) {
 					gera(" CALL L"+simbolo.getRotulo().intValue());
-					gera(" LDV 0");
+					
 				} else {
 					simbolo = analisadorSemantico.pesquisaDeclaracaoVariavel(ordenacaoPosfixa.get(i).getToken().getLexema());
 					gera(" LDV "+simbolo.getRotulo().intValue());

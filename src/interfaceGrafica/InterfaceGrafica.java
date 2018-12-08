@@ -127,22 +127,22 @@ public class InterfaceGrafica {
 					tabelaToken.getColumn(i).pack();
 				}
 				if(contemErroLexico) {
-					textResultado.setText("Erro l�xico encontrado na linha "
-				+(arquivo.getLinhaCorrente()+1)+" no posi��o do arquivo: "
-							+arquivo.getIndiceCorrente()+", \n"+
+					textResultado.setText("Erro léxico encontrado na linha "
+				+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
+							+arquivo.getIndiceCorrente()+", "+
 				 erro);
 				} else if(contemErroSintatico){
-					textResultado.setText("Erro sint�tico encontrado na linha "
-							+(arquivo.getLinhaCorrente()+1)+" no posi��o do arquivo: "
-										+arquivo.getIndiceCorrente()+", \n"+
+					textResultado.setText("Erro sintático encontrado na linha "
+							+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
+										+arquivo.getIndiceCorrente()+", "+
 							 erro);
 				} else if(contemErroSemantico){
-					textResultado.setText("Erro sem�ntico encontrado na linha "
-							+(arquivo.getLinhaCorrente()+1)+" no posi��o do arquivo: "
-										+arquivo.getIndiceCorrente()+", \n"+
+					textResultado.setText("Erro semântico encontrado na linha "
+							+(arquivo.getLinhaCorrente()+1)+" no posição do arquivo: "
+										+arquivo.getIndiceCorrente()+", "+
 							 erro);
 				} else if(contemErroDeGeracao){
-					textResultado.setText("Erro de geracao ocorreu \\n"+
+					textResultado.setText("Erro de geracao ocorreu "+
 							 erro);
 				} else {
 					textResultado.setText("Programa compilado com sucesso!");

@@ -66,7 +66,7 @@ public class Arquivo {
 	}
 	
 	public boolean fimDoArquivo() {
-		if(indiceCorrente>=tamanho) {
+		if(indiceCorrente>tamanho) {
 			return true;
 		}
 		return false;

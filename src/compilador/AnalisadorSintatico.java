@@ -31,8 +31,8 @@ public class AnalisadorSintatico {
 		this.analisadorLexico = new AnalisadorLexico();
 		this.analisadorSemantico = new AnalisadorSemantico();
 		this.geradorDeCodigo = new GeradorDeCodigo();
-		this.auxAlloc1 = 1;
-		this.alloc = 1;
+		this.auxAlloc1 = 0;
+		this.alloc = 0;
 		this.rotulo = 1;
 		conversorPisfixa = new ConversorPosfixa();
 
@@ -70,7 +70,7 @@ public class AnalisadorSintatico {
 						if (arquivo.fimDoArquivo()) {
 							return true;
 						} else {
-							throw new ErroSintaticoException("Final do Arquivo n�o encontrado.");
+							throw new ErroSintaticoException("Final do Arquivo não encontrado.");
 						}
 					} else {
 						throw new ErroSintaticoException("Ponto final faltando.");
@@ -79,10 +79,10 @@ public class AnalisadorSintatico {
 					throw new ErroSintaticoException("Ponto e vírgula faltando.");
 				}
 			} else {
-				throw new ErroSintaticoException("Nome do programa n�o encontrado.");
+				throw new ErroSintaticoException("Nome do programa não encontrado.");
 			}
 		} else {
-			throw new ErroSintaticoException("Inicio do programa n�o encontrado.");
+			throw new ErroSintaticoException("Inicio do programa não encontrado.");
 		}
 	}
 
@@ -108,7 +108,7 @@ public class AnalisadorSintatico {
 					}
 				}
 			} else {
-				throw new ErroSintaticoException("Identificador de vari�vel n�o encontrado");
+				throw new ErroSintaticoException("Identificador de variável não encontrado");
 			}
 		}
 	}
@@ -119,7 +119,7 @@ public class AnalisadorSintatico {
 		do {
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				if (!pesquisaDuplicidadeVariaveisTabela(tokenCorrente.getLexema())) {
-					//insere vari�vel na tabela de simbolos
+					//insere variável na tabela de simbolos
 					insereTabela(tokenCorrente.getLexema(), TipoTabelaSimboloEnum.VARIAVEL, null, new Integer(alloc));
 					System.out.println(tokenCorrente.getLexema()+","+alloc);
 					//incrementa o auxiliar para a gera��o de c�digo
@@ -131,17 +131,17 @@ public class AnalisadorSintatico {
 						if (tokenCorrente.getSimbolo().equals(SimboloEnum.Svirgula)) {
 							pegaToken(arquivo, listaToken);
 							if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos)) {
-								throw new ErroSintaticoException("declara��o incorreta de vari�veis.");
+								throw new ErroSintaticoException("declaração incorreta de variáveis.");
 							}
 						}
 					} else {
-						throw new ErroSintaticoException("declara��o incorreta de vari�veis.");
+						throw new ErroSintaticoException("declaração incorreta de variáveis.");
 					}
 				} else {
-					throw new ErroSemanticoException("vari�vel com nome duplicado.");
+					throw new ErroSemanticoException("variável com nome duplicado.");
 				}
 			} else {
-				throw new ErroSintaticoException("nome de vari�vel n�o declarado.");
+				throw new ErroSintaticoException("nome de variável não declarado.");
 			}
 		} while (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sdoispontos));
 		// ponto de alloc
@@ -155,7 +155,7 @@ public class AnalisadorSintatico {
 			throws FimInesperadoDoArquivoException, CaractereNaoEsperadoEncontradoException, ErroSintaticoException {
 		if (!tokenCorrente.getSimbolo().equals(SimboloEnum.Sinteiro)
 				&& !tokenCorrente.getSimbolo().equals(SimboloEnum.Sbooleano)) {
-			throw new ErroSintaticoException("declara��o incorreta de vari�veis: Tipo errado de vari�vel.");
+			throw new ErroSintaticoException("declaração incorreta de variáveis: Tipo errado de variável.");
 		}
 		colocaTipoVariavel(tokenCorrente.getSimbolo());
 		pegaToken(arquivo, listaToken);
@@ -178,7 +178,7 @@ public class AnalisadorSintatico {
 			}
 			pegaToken(arquivo, listaToken);
 		} else {
-			throw new ErroSintaticoException("declara��o incorreta de comandos.");
+			throw new ErroSintaticoException("declaração incorreta de comandos.");
 		}
 	}
 
@@ -216,6 +216,10 @@ public class AnalisadorSintatico {
 			
 			analisaExpressao(arquivo, listaToken);
 			System.out.println(conversorPisfixa.getExpressao());
+			
+			Simbolo funcao = getFuncaoTabela(tokenAux.getLexema());
+			
+			
 			geradorDeCodigo.geraPosfixaAtribuicao(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
 		} else {
 			analisaChamadaProcedimento(arquivo, listaToken,tokenAux);
@@ -239,7 +243,7 @@ public class AnalisadorSintatico {
 						throw new ErroSintaticoException(") faltando.");
 					} 
 				} else {
-					throw new ErroSemanticoException("Chamada de vari�vel n�o declarada");
+					throw new ErroSemanticoException("Chamada de variável não declarada");
 				}
 			} else {
 				throw new ErroSintaticoException("Identificador do comando leia faltando.");
@@ -256,18 +260,23 @@ public class AnalisadorSintatico {
 			pegaToken(arquivo, listaToken);
 			if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sidentificador)) {
 				Simbolo simbolo = pesquisaDeclaracaoVariavel(tokenCorrente.getLexema());
+			// buscando a função e a variavel
+				Simbolo simbolo2 = getFuncaoTabela(tokenCorrente.getLexema());
 				if (null!=simbolo) {
 					geradorDeCodigo.gera(" LDV "+simbolo.getRotulo().intValue());
 					geradorDeCodigo.gera(" PRN");
+				}  else if(null!=simbolo2) {
+					geradorDeCodigo.gera("CALL L"+simbolo2.getRotulo().intValue());
+				} else {
+					throw new ErroSemanticoException("Chamada de identificador não declarado");
+				}
 					pegaToken(arquivo, listaToken);
 					if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfecha_parenteses)) {
 						pegaToken(arquivo, listaToken);
 					} else {
 						throw new ErroSintaticoException(") faltando.");
 					} 
-				}  else {
-					throw new ErroSemanticoException("Chamada de vari�vel n�o declarada");
-				}
+				
 			} else {
 				throw new ErroSintaticoException("Identificador do comando escreva faltando.");
 			}
@@ -286,6 +295,11 @@ public class AnalisadorSintatico {
 		conversorPisfixa = new ConversorPosfixa();
 		analisaExpressao(arquivo, listaToken);
 		System.out.println(conversorPisfixa.getExpressao());
+		
+		if(!analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())) {
+			throw new ErroSemanticoException("Expressão não booleana utilizada em comando enquanto");
+		}
+		
 		geradorDeCodigo.geraPosfixaBooleano(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
 
 		if (tokenCorrente.getSimbolo().equals(SimboloEnum.Sfaca)) {
@@ -309,6 +323,9 @@ public class AnalisadorSintatico {
 		conversorPisfixa = new ConversorPosfixa();
 		analisaExpressao(arquivo, listaToken);
 		System.out.println(conversorPisfixa.getExpressao());
+		if(!analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())) {
+			throw new ErroSemanticoException("Expressão não booleana utilizada em comando SE");
+		}
 		geradorDeCodigo.geraPosfixaBooleano(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
 
 		//TODO validar se o retorno é boolean
@@ -331,7 +348,7 @@ public class AnalisadorSintatico {
 				geradorDeCodigo.gera("L"+auxRot1+" NULL");
 			}
 		} else {
-			throw new ErroSintaticoException("Comando ent�o faltando.");
+			throw new ErroSintaticoException("Comando então faltando.");
 		}
 
 	}
@@ -424,24 +441,25 @@ public class AnalisadorSintatico {
 							analisaBloco(arquivo, listaToken);
 						}
 					} else {
-						throw new ErroSintaticoException("tipo de fun��o faltando.");
+						throw new ErroSintaticoException("tipo de função faltando.");
 					}
 				} else {
 					throw new ErroSintaticoException(": faltando.");
 				}
 			} else {
-				throw new ErroSemanticoException("Nome de fun��o duplicado.");
+				throw new ErroSemanticoException("Nome de função duplicado.");
 			}
 		} else {
-			throw new ErroSintaticoException("indentificador de fun��o faltando.");
+			throw new ErroSintaticoException("indentificador de função faltando.");
 		}
 		System.out.println("FUNÇÃO CORRENTE"+tokenAux.getLexema());
 		int auxDalloc = desempilha(tokenAux.getLexema());
 		if (auxDalloc>0) {
 			auxAlloc1 -= auxDalloc;
-			geradorDeCodigo.gera(" DALLOC " + auxAlloc1 + "," + auxDalloc);
+			geradorDeCodigo.gera(" RETURNF " + auxAlloc1 + "," + auxDalloc);
+		}else {
+			geradorDeCodigo.gera(" RETURNF");
 		}
-		geradorDeCodigo.gera(" RETURNF");
 	}
 
 	private void analisaExpressao(Arquivo arquivo, List<Token> listaToken)
@@ -536,7 +554,7 @@ public class AnalisadorSintatico {
 					pegaToken(arquivo, listaToken);
 				}
 			}else {
-				throw new ErroSemanticoException("Identificador utilizado n�o declarado");
+				throw new ErroSemanticoException("Identificador utilizado não declarado");
 			}
 		} else if (tokenCorrente.getSimbolo().equals(SimboloEnum.Snumero)) {
 			//TODO GERA CARREGA CONSTANTE

@@ -1,0 +1,18 @@
+ START
+ ALLOC 0,3
+ RD
+ STR 1
+ RD
+ STR 2
+ LDV 1
+ LDV 2
+ ADD
+ STR 0
+ LDV 0
+ PRN
+ LDV 1
+ PRN
+ LDV 2
+ PRN
+ DALLOC 0,3
+ HLT
