@@ -172,8 +172,14 @@ public class AnalisadorSemantico {
 			if(token.getSimbolo().equals(SimboloEnum.Smaior)
 					||token.getSimbolo().equals(SimboloEnum.Smaiorig)
 					||token.getSimbolo().equals(SimboloEnum.Smenorig)
+					||token.getSimbolo().equals(SimboloEnum.Smenor)
 					||token.getSimbolo().equals(SimboloEnum.Sdif)
-					||token.getSimbolo().equals(SimboloEnum.Sig)) {
+					||token.getSimbolo().equals(SimboloEnum.Sig)
+					||token.getSimbolo().equals(SimboloEnum.Sverdadeiro)
+					||token.getSimbolo().equals(SimboloEnum.Sfalso)
+					||token.getSimbolo().equals(SimboloEnum.Se)
+					||token.getSimbolo().equals(SimboloEnum.Sou)
+					||token.getSimbolo().equals(SimboloEnum.Snao)) {
 				return true;
 			}
 		}

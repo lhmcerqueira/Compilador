@@ -218,6 +218,46 @@ public class AnalisadorSintatico {
 			System.out.println(conversorPisfixa.getExpressao());
 			
 			Simbolo funcao = getFuncaoTabela(tokenAux.getLexema());
+			Simbolo variavel = pesquisaDeclaracaoVariavel(tokenAux.getLexema());
+			if (funcao!=null) {
+				if (!analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())
+						&& funcao.getTipo().equals(TipoTabelaSimboloEnum.FUNCAO_BOOLEANO)) {
+					throw new ErroSemanticoException(
+							"Expressão não booleana utilizada em atribuição de função booleana");
+				} else if (analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())
+						&& funcao.getTipo().equals(TipoTabelaSimboloEnum.FUNCAO_INTEIRO)) {
+					throw new ErroSemanticoException("Expressão não inteira utilizada em atribuição de função inteira");
+				} 
+			} else if (variavel!=null) {
+				if(conversorPisfixa.getOrdenacaoPosfixa().size()==3) {
+					Simbolo funcaoTabela = getFuncaoTabela(conversorPisfixa.getOrdenacaoPosfixa().get(1).getToken().getLexema());
+					Simbolo variavelaux = pesquisaDeclaracaoVariavel(conversorPisfixa.getOrdenacaoPosfixa().get(1).getToken().getLexema());
+					if(funcaoTabela!=null) {
+						if(variavel.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.BOOLEANO)
+								&&!funcaoTabela.getTipo().equals(TipoTabelaSimboloEnum.FUNCAO_BOOLEANO)) {
+							throw new ErroSemanticoException("Expressão não booleana utilizada em atribuição de função booleana");	
+						} else if (variavel.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.INTEIRO)
+								&&!funcaoTabela.getTipo().equals(TipoTabelaSimboloEnum.FUNCAO_INTEIRO)) {
+							throw new ErroSemanticoException("Expressão não inteira utilizada em atribuição de função inteira");	
+						} 
+					} else if(variavelaux!=null) {
+						if(variavel.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.BOOLEANO)
+								&&!variavelaux.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.BOOLEANO)) {
+							throw new ErroSemanticoException("Expressão não booleana utilizada em atribuição de função booleana");	
+						} else if (variavel.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.INTEIRO)
+								&&!variavelaux.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.INTEIRO)) {
+							throw new ErroSemanticoException("Expressão não inteira utilizada em atribuição de função inteira");	
+						} 
+					}	
+				} else if (!analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())
+						&& variavel.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.BOOLEANO)) {
+					throw new ErroSemanticoException(
+							"Expressão não booleana utilizada em atribuição de função booleana");
+				} else if (analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())
+						&& variavel.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.INTEIRO)) {
+					throw new ErroSemanticoException("Expressão não inteira utilizada em atribuição de função inteira");
+				} 
+			}
 			
 			
 			geradorDeCodigo.geraPosfixaAtribuicao(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
@@ -296,7 +336,16 @@ public class AnalisadorSintatico {
 		analisaExpressao(arquivo, listaToken);
 		System.out.println(conversorPisfixa.getExpressao());
 		
-		if(!analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())) {
+		if(conversorPisfixa.getOrdenacaoPosfixa().size()==1) {
+			Simbolo funcaoTabela = getFuncaoTabela(conversorPisfixa.getOrdenacaoPosfixa().get(0).getToken().getLexema());
+			Simbolo variavel = pesquisaDeclaracaoVariavel(conversorPisfixa.getOrdenacaoPosfixa().get(0).getToken().getLexema());
+			
+			if(funcaoTabela!=null&&!funcaoTabela.getTipo().equals(TipoTabelaSimboloEnum.FUNCAO_BOOLEANO)) {
+				throw new ErroSemanticoException("Expressão não booleana utilizada em comando SE");
+			} else if(variavel!=null&&!variavel.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.BOOLEANO)){
+				throw new ErroSemanticoException("Expressão não booleana utilizada em comando SE");
+			}
+		} else if(!analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())) {
 			throw new ErroSemanticoException("Expressão não booleana utilizada em comando enquanto");
 		}
 		
@@ -323,7 +372,16 @@ public class AnalisadorSintatico {
 		conversorPisfixa = new ConversorPosfixa();
 		analisaExpressao(arquivo, listaToken);
 		System.out.println(conversorPisfixa.getExpressao());
-		if(!analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())) {
+		if(conversorPisfixa.getOrdenacaoPosfixa().size()==1) {
+			Simbolo funcaoTabela = getFuncaoTabela(conversorPisfixa.getOrdenacaoPosfixa().get(0).getToken().getLexema());
+			Simbolo variavel = pesquisaDeclaracaoVariavel(conversorPisfixa.getOrdenacaoPosfixa().get(0).getToken().getLexema());
+			
+			if(funcaoTabela!=null&&!funcaoTabela.getTipo().equals(TipoTabelaSimboloEnum.FUNCAO_BOOLEANO)) {
+				throw new ErroSemanticoException("Expressão não booleana utilizada em comando SE");
+			} else if(variavel!=null&&!variavel.getTipoVariavel().equals(TipoVariavelTabelaSimbolosEnum.BOOLEANO)){
+				throw new ErroSemanticoException("Expressão não booleana utilizada em comando SE");
+			}
+		} else if(!analisadorSemantico.analisaExpressaoBooleana(conversorPisfixa.getOrdenacaoPosfixa())) {
 			throw new ErroSemanticoException("Expressão não booleana utilizada em comando SE");
 		}
 		geradorDeCodigo.geraPosfixaBooleano(conversorPisfixa.getOrdenacaoPosfixa(), analisadorSemantico);
